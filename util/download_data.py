@@ -13,7 +13,7 @@ def download_files_eurostat(file):
     try:
         print("downloading:"+file+"........")
         #Download files from eurostat        
-        u = urllib.request.urlopen(baseUrl+file+'.tsv.gz')
+        u = urllib.request.urlopen(baseUrl + 'data/' + file.upper() + '?format=TSV&compressed=true')
         localFile = open(path+file+'.tsv.gz', 'wb')
         localFile.write(u.read())
         localFile.close()        
@@ -136,8 +136,9 @@ def stack_any_file(file):
         newHeaders.append(lastHeader.split('\\')[1])
         newHeaders.append('values')
         for i in range(len(newHeaders)):
-              if newHeaders[i]=='time':
+              if newHeaders[i]=='TIME_PERIOD':
                   newHeaders[i]='year'
+              newHeaders[i] = newHeaders[i].replace('-',"") # New Eurostat time periods contain hyphens e.g. 2022Q3 becomes 2022-Q3
                 
         b.columns= newHeaders  
          #To remove spaces in dimensions, (needed for ad-hoc module in health hlth_ehis_hc1,hlth_ehis_hc4,earn_ses10_15,...

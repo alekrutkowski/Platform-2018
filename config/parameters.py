@@ -11,7 +11,7 @@ import numpy as np
 
 #baseUrl='http://epp.eurostat.ec.europa.eu/NavTree_prod/everybody/BulkDownloadListing?sort=1&downfile=data%2F'
 #After redesign
-baseUrl='https://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?sort=1&file=data%2F'
+baseUrl='https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/'
 #Number of days minimum to download an existing file
 daysToNotDownload=0.1
 

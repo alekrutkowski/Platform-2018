@@ -13,7 +13,7 @@ import os.path
 
 
 try:
-    DATA_INFO=pd.read_csv('http://ec.europa.eu/eurostat/estat-navtree-portlet-prod/BulkDownloadListing?sort=1&file=table_of_contents_en.txt', sep='\t',warn_bad_lines=False, error_bad_lines=False)    
+    DATA_INFO=pd.read_csv('https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=EN', sep='\t',warn_bad_lines=False, error_bad_lines=False)    
     DATA_INFO.to_csv(stacked_path+"dataset_info.csv")
 except Exception as e:
     print("ERROR:"+str(e))
