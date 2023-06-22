@@ -48,7 +48,7 @@ def clean_working_df(a):
     return a
 
 def getQuarter(x):
-    value=x['year'].strip()   
+    value=x['year'].strip().str.replace('-', '', regex=False)
     if value.endswith('01') or value.endswith('02') or value.endswith('03'):
         return "Q1"
     if value.endswith('04') or value.endswith('05') or value.endswith('06'):
@@ -60,6 +60,7 @@ def getQuarter(x):
  
 def filterByYear(df,startYear):
     df['year']=df['year'].map(str)
+    df['year'] = df['year'].str.replace('-', '', regex=False)
     df['real_year']=df['year'].apply(lambda x: x[0:4])
     df['real_year']=df['real_year'].map(int)
     df=df[(df.real_year > startYear)]

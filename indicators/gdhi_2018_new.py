@@ -37,6 +37,7 @@ def read_data(time, currency,defl):
         download_and_stack(['nasq_10_nf_tr', 'namq_10_gdp'])
         nominal_gdhi=pd.read_csv(stacked_path+'nasq_10_nf_tr.csv')        
         nominal_gdhi=nominal_gdhi[nominal_gdhi.s_adj =='NSA']
+        nominal_gdhi['year'] = nominal_gdhi['year'].str.replace('-', '', regex=False)
         #nominal_gdhi=nominal_gdhi[nominal_gdhi.s_adj =='SCA']
         nominal_gdhi=nominal_gdhi[nominal_gdhi['year'].str[0:1]=='2']
         deflator= pd.read_csv(stacked_path+'namq_10_gdp.csv')

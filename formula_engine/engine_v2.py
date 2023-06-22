@@ -56,6 +56,7 @@ def getFactorData(dataset, dimensions, letter, years_back=0,):
     
     if years_back<0:
         if "Q" in str(indicatorData.iloc[0]['year']):
+            indicatorData['year'] = indicatorData['year'].str.replace('-', '', regex=False)
             indicatorData['y']=indicatorData['year'].str[0:4].map(int)+(-1)*years_back
             indicatorData['q']=indicatorData['year'].str[4:]
             indicatorData['year']=indicatorData['y'].map(str)+indicatorData['q']            

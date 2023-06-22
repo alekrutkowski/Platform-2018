@@ -14,6 +14,8 @@ import os.path
 
 try:
     DATA_INFO=pd.read_csv('https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=EN', sep='\t',warn_bad_lines=False, error_bad_lines=False)    
+    DATA_INFO['data start'] = DATA_INFO['data start'].str.replace('-', '', regex=False)
+    DATA_INFO['data end'] = DATA_INFO['data end'].str.replace('-', '', regex=False)
     DATA_INFO.to_csv(stacked_path+"dataset_info.csv")
 except Exception as e:
     print("ERROR:"+str(e))
