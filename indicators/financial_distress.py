@@ -73,7 +73,6 @@ a=merged.copy()
 a.columns=['date','indicator','value_n']
 a['geo']='EU27'
 a['date']=a['date'].map(str)
-a['date'] = a['date'].str.replace('-', '', regex=False)
 a['year']=a['date'].str[0:4]
 a['month']=a['date'].str[5:7]
 a['month']=a['month'].map(int)
@@ -117,7 +116,6 @@ EUaggregate.columns=['date','geo','indicator','value_n']
 b=b.append(EUaggregate)
 
 b['date']=b['date'].map(str)
-b['date'] = b['date'].str.replace('-', '', regex=False)
 b['year']=b['date'].str[0:4]
 b['month']=b['date'].str[5:7]
 b['month']=b['month'].map(int)

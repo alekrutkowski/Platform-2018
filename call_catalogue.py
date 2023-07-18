@@ -144,7 +144,7 @@ def quarterly():
     
     # 1) Filter years smaller than 2000    
     finalData=filterByYear(finalData, 2007)
-    finalData['year'] = finalData['year'].str.replace('-', '', regex=False)
+    
     finalData['period_type']=finalData['year'].str[4:5]
     finalData['y']=finalData['year'].str[0:4]
     finalData['q_m']=finalData['year'].str[4:]
