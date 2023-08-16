@@ -142,7 +142,7 @@ def yearlyGDHI():
     
     #Prepare and save files
     final= prepareFile(dataGrowth, 'nominal')
-    final=final.append(prepareFile(realDataGrowth, 'real'))    
+    final=pd.concat([final, prepareFile(realDataGrowth, 'real')], ignore_index=True) # final=final.append(prepareFile(realDataGrowth, 'real')) # https://stackoverflow.com/a/75956237
     final.to_csv(calculated_path+'GDHI_a.csv',index=False, float_format='%.3f')
     
     #Calculate indicator for scoreboard
@@ -164,7 +164,7 @@ def quarterlyGDHI():
     
     #Prepare and save files
     final= prepareFile(dataGrowth, 'nominal')
-    final=final.append(prepareFile(realDataGrowth, 'real'))    
+    final=pd.concat([final, prepareFile(realDataGrowth, 'real')], ignore_index=True) # final=final.append(prepareFile(realDataGrowth, 'real')) # https://stackoverflow.com/a/75956237
     final.to_csv(calculated_path+'GDHI_q.csv',index=False, float_format='%.3f')
     #final.to_csv(calculated_path+'GDHI_q_SCA.csv',index=False, float_format='%.3f')
     
