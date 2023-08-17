@@ -179,7 +179,8 @@ for indic in set(JER_Scoreboard_h['IND_CODE']):
     print('Calculating scores for headline indicator...'+indic+'...')
     for year in set(JER_Scoreboard_h['year']):
         tmp = JER_Scoreboard_h[(JER_Scoreboard_h.IND_CODE==indic) & (JER_Scoreboard_h.year==year) &(JER_Scoreboard_h.geo.isin(CtryList))]
-        scores=scores.append(calculate_score(tmp, 'value_n', 'avg', year, indic))
+        # scores=scores.append(calculate_score(tmp, 'value_n', 'avg', year, indic))
+        scores = pd.concat([scores, calculate_score(tmp, 'value_n', 'avg', year, indic)], ignore_index=True) # https://stackoverflow.com/a/75956237
 
 # Calculate annual changes
 for i in range(1):
@@ -199,7 +200,8 @@ for indic in set(JER_Scoreboard_h['IND_CODE']):
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
-        changes=changes.append(tmp)
+        # changes=changes.append(tmp)
+        changes = pd.concat([changes, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
 #OLD (net earnings not used anymore)
 # Overwrite the changes for mixed indicators from the external file: net earnings! HARD CODED the rank of the indicator
@@ -218,7 +220,8 @@ for indic in set(changes['IND_CODE']):
     print('Calculating  scores for the indicator '+indic+'...')
     for year in set(changes['year']): 
         tmp = changes[(changes.IND_CODE==indic) & (changes.year==year)]        
-        scoresD = scoresD.append(calculate_score(tmp, 'ychange', 'avg', year, indic))
+        # scoresD = scoresD.append(calculate_score(tmp, 'ychange', 'avg', year, indic))
+        scoresD = pd.concat([scoresD, calculate_score(tmp, 'ychange', 'avg', year, indic)], ignore_index=True)  # https://stackoverflow.com/a/75956237
         
 #scoresD = scoresD[(scoresD.geo.isin(CtryList))]
 scoresD = scoresD[['IND_CODE','Indicator','geo','year','ychange','ychange_flag','score_ychange']]
@@ -239,7 +242,8 @@ print('Calculating the last available year...')
 JER_Scores = pd.DataFrame()
 for indic in set(scores['IND_CODE']):
     tmp = scores[(scores.IND_CODE==indic) & (scores.year==getField(indic,'lastYear'))]
-    JER_Scores = JER_Scores.append(tmp)
+    # JER_Scores = JER_Scores.append(tmp)
+    JER_Scores = pd.concat([JER_Scores, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
 scores= JER_Scores
 # Prepare the dataframe for saving
@@ -257,7 +261,8 @@ for ctry in set(scores['geo']):
     tmp = scores[scores.geo==ctry]
     pivot = pd.pivot_table(tmp,values = ["scoreL","scoreD"],index=['indicator'],columns=['geo'])
     pivot.to_excel(writer,ctry)
-writer.save()
+# writer.save()
+writer.close() # https://stackoverflow.com/a/76119258
 
 # ************************************************************************************************************
 # ***** ---- Step 3 - Producing data on levels and yearly changes for the last three years for all indicators...
@@ -288,7 +293,8 @@ for indic in set(JER_Scoreboard_b['IND_CODE']):
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
-        changes=changes.append(tmp)
+        # changes=changes.append(tmp)
+        changes = pd.concat([changes, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
         
 changes = changes[['IND_CODE','geo','year','ychange','ychange_flag']]
 
@@ -302,7 +308,8 @@ JER_Scoreboard = pd.DataFrame()
 for indic in set(JER_Scoreboard_b['IND_CODE']):
     year=getField(indic,'lastYear')
     tmp = JER_Scoreboard_b[(JER_Scoreboard_b.IND_CODE==indic) & ((JER_Scoreboard_b.year==year) | (JER_Scoreboard_b.year==year-1) |(JER_Scoreboard_b.year==year-2))]
-    JER_Scoreboard = JER_Scoreboard.append(tmp)
+    # JER_Scoreboard = JER_Scoreboard.append(tmp)
+    JER_Scoreboard = pd.concat([JER_Scoreboard, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
 JER_Scoreboard.to_csv(localpath+'JER_scoreboard.csv') # Data on levels and changes saved: all indicators, last three years, all EU countries
 ranking = pd.read_csv(localpath+'Countries_ranking.csv')
@@ -317,7 +324,8 @@ JER_Scoreboard = pd.DataFrame()
 for indic in set(JER_Scoreboard_b['IND_CODE']):
     year=getField(indic,'lastYear')
     tmp = JER_Scoreboard_b[(JER_Scoreboard_b.IND_CODE==indic) & ((JER_Scoreboard_b.year==year) | (JER_Scoreboard_b.year==year-1) |(JER_Scoreboard_b.year==year-2))]
-    JER_Scoreboard = JER_Scoreboard.append(tmp)
+    # JER_Scoreboard = JER_Scoreboard.append(tmp)
+    JER_Scoreboard = pd.concat([JER_Scoreboard, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 for i in range(2):
     print('')
 JER_Scoreboard_diff = pd.DataFrame()
@@ -344,19 +352,22 @@ for indic in set(JER_Scoreboard['IND_CODE']):
         aggEU['ychange']=tmpEU['ychange'].mean()
         aggEA['ychange']=tmpEA['ychange'].mean()
         tmpEU = JER_Scoreboard[(JER_Scoreboard.IND_CODE==indic) & (JER_Scoreboard.year==year) & (JER_Scoreboard.geo.isin(ExCtryList))]
-        tmpEU = tmpEU.append(aggEU)
-        tmpEU = tmpEU.append(aggEA)
+        # tmpEU = tmpEU.append(aggEU)
+        tmpEU = pd.concat([tmpEU, aggEU], ignore_index=True)  # https://stackoverflow.com/a/75956237
+        # tmpEU = tmpEU.append(aggEA)
+        tmpEU = pd.concat([tmpEU, aggEA], ignore_index=True)  # https://stackoverflow.com/a/75956237
         tmpEU['EUnwL'] = aggEU['value_n'].mean()
         tmpEU['EUnwD'] = aggEU['ychange'].mean() 
         tmpEU['DistEU'] = tmpEU['value_n'] - tmpEU['EUnwL']
         tmpEU['DiffMSEU'] = tmpEU['ychange'] - tmpEU['EUnwD']
-        JER_Scoreboard_diff = JER_Scoreboard_diff.append(tmpEU)
+        # JER_Scoreboard_diff = JER_Scoreboard_diff.append(tmpEU)
+        JER_Scoreboard_diff = pd.concat([JER_Scoreboard_diff, tmpEU], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
 JER_Scoreboard_diff['flag']=JER_Scoreboard_diff['flag'].replace(np.nan,'')
 JER_Scoreboard_diff['ychange_flag']=JER_Scoreboard_diff['ychange_flag'].replace(np.nan,'')    
 JER_Scoreboard_diff.to_csv(localpath+'JER_scoreboard_diff_check.csv')
 JER_Scoreboard_diff = JER_Scoreboard_diff[['IND_CODE','Indicator','type','Order','change','geo','year','value_n','flag','ychange','ychange_flag','DistEU','DiffMSEU']]
-headline = JER_Scoreboard_diff[JER_Scoreboard_b.type=='H']
+headline = JER_Scoreboard_diff[JER_Scoreboard_diff.type=='H']
 headline.to_csv(localpath+'JER_scoreboard_diff_head.csv',index=False, float_format='%.3f')  # Save here only the headline indicators
 JER_Scoreboard_diff.to_csv(localpath+'JER_scoreboard_diff.csv',index=False, float_format='%.3f')  # Save all indicators. In contains data in headline
 
@@ -371,7 +382,8 @@ table = table[['IND_CODE','Indicator','type','Order','change','geo','year','valu
 JER_Scoreboard_agg=pd.read_csv(localpath+'JER_scoreboard_diff.csv')
 JER_Scoreboard_agg = JER_Scoreboard_agg[['IND_CODE','Indicator','type','Order','change','geo','year','value_n','flag','ychange','ychange_flag']]
 aggNW = JER_Scoreboard_agg[JER_Scoreboard_agg.geo.isin(AggNWList)]
-table=table.append(aggNW)
+# table=table.append(aggNW)
+table = pd.concat([table, aggNW], ignore_index=True)  # https://stackoverflow.com/a/75956237
 table = pd.merge(ranking,table,on=['geo'])
 table['flag']=table['flag'].replace(np.nan,'')
 table['ychange_flag']=table['ychange_flag'].replace(np.nan,'')
@@ -412,7 +424,8 @@ comp = pd.DataFrame() # years HARD CODED
 for indic in set(compare.IND_CODE) :
     year=getField(indic,'lastYear')
     tmp=compare[(compare.IND_CODE==indic) &((compare.year==2008) | (compare.year==2013) | (compare.year==pd.to_numeric(year)))]
-    comp=comp.append(tmp)
+    # comp=comp.append(tmp)
+    comp = pd.concat([comp, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 compare=comp.sort_values('Order')    
 pivotc=pd.pivot_table(compare,values='value_n',index=['rank','geo'],columns=['Order','Indicator','year'])
 
@@ -441,7 +454,8 @@ diff = pd.DataFrame() # years HARD CODED
 for indic in set(table.IND_CODE) :
     yr=getField(indic,'lastYear')
     tmp=table[(table.IND_CODE==indic) &((table.year==2008) | (table.year==2013) | (table.year==pd.to_numeric(yr)))]
-    diff=diff.append(tmp)
+    # diff=diff.append(tmp)
+    diff = pd.concat([diff, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 table=diff.sort_values('Order') 
 
 pivot_diff = pd.pivot_table(table,values='value',index=['rank','geo'],columns=['Order','Indicator','year','diff'])
@@ -471,7 +485,8 @@ pivotsbf.to_excel(writer,'Supplementary breakdowns_flags')
 pivotc.to_excel(writer,'Comparison')
 cutoff.to_excel(writer,'Cut_offs')
 
-writer.save()
+# writer.save()
+writer.close() # https://stackoverflow.com/a/76119258
 
 # ********************   END OF MAIN PROGRAMME    ************************************************
 

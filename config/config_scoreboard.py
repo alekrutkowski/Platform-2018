@@ -9,6 +9,10 @@ import os
 import os.path
 from os import path
 import shutil
+from datetime import datetime
+
+CurrentDate = datetime.now().strftime('%Y.%m.%d')
+
 
 CtryList=['AT','BE','BG','CY','CZ','DE','DK','EE','EL','ES','FI','FR','HR','HU','IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK']
 EAList=['AT','BE','CY','DE','EE','EL','ES','FI','FR','IE','IT','LT','LU','LV','MT','NL','PT','SI','SK']
@@ -21,7 +25,7 @@ ListSex=['T','F','M']
 JER_catalogue='catalogue - JER Scoreboard.csv'
 JER_catalogue_q='catalogue - JER Scoreboard_quarterly.csv'
 
-basicpath = 'U:\\04 Data and tools\\Reports\\scoreboard\\2022.12.22\\'
+basicpath = 'U:\\04 Data and tools\\Reports\\scoreboard\\' + CurrentDate + '\\'
 localpath = basicpath + 'output\\'
 checkpath = basicpath + 'checks\\'
 
