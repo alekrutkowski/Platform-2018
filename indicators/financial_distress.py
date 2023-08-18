@@ -10,7 +10,7 @@ from util.download_data import *
 from config.parameters import *
 
 #normally the file sent by ECFIN is named e.g. "DG_EMPL_detailed_data_EU_updated Feb 2019.xls"
-original=pd.ExcelFile(original_path+'DG_EMPL_financial_distress.xls')
+original=pd.ExcelFile(original_path+'DG_EMPL_financial_distress.xlsx')
 
 def getPrefix(sheet):
     if sheet=='EU':
@@ -29,11 +29,11 @@ EUaggregate=pd.DataFrame()
 
 for sh in sheets:   
     #START NEW   
-    EU=original.parse(sh, header=[0,1]) 
-    d=EU[12]
+    EU=original.parse(sh, header=[0,1])
+    d=EU.iloc[:, 12] # d=EU[12]
     
     #workaround for date column, make it more elegant
-    dates=EU['Question number:']
+    dates=EU.iloc[:,0] # dates=EU['Question number:']
     d = pd.merge(dates, d, left_index=True, right_index=True)
     d = d.set_index('Category of reply:')
     

@@ -168,7 +168,7 @@ class catalogue:
              if final.empty and temp is not None:
                  final=temp.copy()
              else:  
-                 final=final.append(temp)
+                 final=pd.concat([final, temp], ignore_index=True) # final=final.append(temp) # https://stackoverflow.com/a/75956237
          #Compilation of blocking errors
          if len(self.error_messages)>0:  
              print("============")
