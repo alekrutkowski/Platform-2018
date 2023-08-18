@@ -10,7 +10,7 @@ from util.download_data import *
 from config.parameters import *
 
 #normally the file sent by ECFIN is named e.g. "DG_EMPL_detailed_data_EU_updated Feb 2019.xls"
-original=pd.ExcelFile(original_path+'DG_EMPL_financial_distress.xlsx')
+original=pd.ExcelFile(original_path+'DG_EMPL_financial_distress.xls')
 
 def getPrefix(sheet):
     if sheet=='EU':
@@ -30,10 +30,10 @@ EUaggregate=pd.DataFrame()
 for sh in sheets:   
     #START NEW   
     EU=original.parse(sh, header=[0,1])
-    d=EU.iloc[:, 12] # d=EU[12]
+    d=EU[12] # d=EU.iloc[:, 12]
     
     #workaround for date column, make it more elegant
-    dates=EU.iloc[:,0] # dates=EU['Question number:']
+    dates=EU['Question number:']
     d = pd.merge(dates, d, left_index=True, right_index=True)
     d = d.set_index('Category of reply:')
     
@@ -66,8 +66,10 @@ for sh in sheets:
         merged=e.copy()
         EUaggregate=EU_M_MM.copy()        
     else:
-        merged=merged.append(e)
-        EUaggregate=EUaggregate.append(EU_M_MM)
+        # merged=merged.append(e)
+        merged = pd.concat([merged, e], ignore_index=True)  # https://stackoverflow.com/a/75956237
+        # EUaggregate=EUaggregate.append(EU_M_MM)
+        EUaggregate = pd.concat([EUaggregate, EU_M_MM], ignore_index=True)  # https://stackoverflow.com/a/75956237
     
 a=merged.copy()
 a.columns=['date','indicator','value_n']
@@ -93,31 +95,37 @@ for ori_data in [original_1,original_2]:
     
     #workaround for date column, make it more elegant
     #"dates" comes from 1st part
-    d = pd.merge(dates, data, left_index=True, right_index=True)
+    # d = pd.merge(dates, data, left_index=True, right_index=True) # pandas.errors.MergeError: Not allowed to merge between different levels. (1 levels on the left, 2 on the right)
+    dates_with_MultiIndex = dates.copy(deep=True)
+    dates_with_MultiIndex.columns = pd.MultiIndex.from_tuples([(col, '') for col in dates.columns])
+    d = pd.merge(dates_with_MultiIndex, data, left_index=True, right_index=True)
     d = d.set_index('Category of reply:')
-    data = d.drop(('Unnamed: 0_level_0', 'Unnamed: 0_level_1'),axis=1)        
+    data = d.drop(('Unnamed: 0_level_0', 'Unnamed: 0_level_1'),axis=1)
     a = data.stack()
     #a = a.stack() This was needed in previous routine
     a = a.reset_index()
     g = pd.DataFrame(a['level_1'].values.tolist(), index=a.index)
     a = pd.merge(a,g,left_index=True, right_index=True)
     a = a.drop('level_1', axis=1)
-    
-    a.columns=['date','value_n','geo','indicator']
+    a = pd.melt(a, id_vars=[a.columns[0],a.columns[-1]])
+    a.columns=['date','indicator','geo','value_n']
     if merged.empty:
         merged=a.copy()
     else:
-        merged=merged.append(a)
+        # merged=merged.append(a)
+        merged = pd.concat([merged, a], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
 #ADD EU AGGREGATES
 b=merged.copy()
 EUaggregate=EUaggregate.reset_index()
 EUaggregate.columns=['date','geo','indicator','value_n']
-b=b.append(EUaggregate)
+# b=b.append(EUaggregate)
+b = pd.concat([b, EUaggregate], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
 b['date']=b['date'].map(str)
 b['year']=b['date'].str[0:4]
 b['month']=b['date'].str[5:7]
+b = b[(~b['value_n'].isna()) & (b['month'] != "")]
 b['month']=b['month'].map(int)
 b['file']=outputFile
 b['value_n']=b['value_n'].map(float)
