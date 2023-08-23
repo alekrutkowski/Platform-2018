@@ -146,7 +146,7 @@ EU_indicators <-
                         list(sheet_name='EU_RE4',col_id2_string='M',moving_avg=FALSE)),
                    new_name='top quartile')
   ) %>% 
-  Reduce(\(x1,x2) merge(x1,x2,by='year_month'),
+  Reduce(function(x1,x2) merge(x1,x2,by='year_month'),
          x=.) %>% 
   .[, 'Financial distress - Total' := 
       get('Running into debt') + get('Having to draw on savings')] %>% 
