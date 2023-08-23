@@ -196,7 +196,7 @@ for indic in set(JER_Scoreboard_h['IND_CODE']):
         tmp=tmp.sort_values('year')
         if len(tmp)>0: ch = tmp.iloc[0]['change']
         if ch=='pp':  tmp['ychange'] = tmp['value_n'].diff()
-        elif ch=='%': tmp['ychange'] = tmp['value_n'].pct_change()    
+        elif ch=='%': tmp['ychange'] = tmp['value_n'].pct_change(fill_method=None) # fill_method=None to avoid incorrect ychange=0 when value_n=missing (should be ychange=missing i.e. np.nan)
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
@@ -289,7 +289,7 @@ for indic in set(JER_Scoreboard_b['IND_CODE']):
         tmp=tmp.sort_values('year')
         if len(tmp)>0: ch = tmp.iloc[0]['change']
         if ch=='pp':  tmp['ychange'] = tmp['value_n'].diff()
-        elif ch=='%': tmp['ychange'] = 100*tmp['value_n'].pct_change() 
+        elif ch=='%': tmp['ychange'] = 100*tmp['value_n'].pct_change(fill_method=None) # fill_method=None to avoid incorrect ychange=0 when value_n=missing (should be ychange=missing i.e. np.nan)
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
@@ -484,6 +484,25 @@ pivotsb.to_excel(writer,'Supplementary breakdowns')
 pivotsbf.to_excel(writer,'Supplementary breakdowns_flags')
 pivotc.to_excel(writer,'Comparison')
 cutoff.to_excel(writer,'Cut_offs')
+
+cutoff_copy = cutoff.copy()
+cutoff_copy['cum_count'] = cutoff_copy.groupby(['Indicator', 'year']).cumcount() + 1
+cutoff_copy['Level or change'] = cutoff_copy['cum_count'].map({1: 'Levels', 2: 'Changes'})
+cutoff_copy.drop('cum_count', axis=1, inplace=True)
+cutoff_copy = cutoff_copy[['Indicator', 'year', 'Level or change', 't1', 't2', 't3', 't4']]
+non_missing_rows = cutoff_copy.dropna(subset=['t1', 't2', 't3', 't4'])
+max_years = non_missing_rows.groupby(['Indicator','Level or change'])['year'].max().reset_index()
+cutoff_copy = pd.merge(cutoff_copy, max_years, on=['Indicator', 'year'], how='inner')
+cutoff_copy.drop('year', axis=1, inplace=True)
+cutoff_copy = cutoff_copy.rename(columns={'Indicator': 'IND_CODE'})
+cutoff_copy.loc[(cutoff_copy['IND_CODE']=='ID61') & (cutoff_copy['Level or change']=='Changes'), # ID61 = GDHI per capita growth (2008=100)
+                'Level or change'] = 'Changes (%)'
+cutoff_copy.loc[(cutoff_copy['IND_CODE']=='ID61') & (cutoff_copy['Level or change']=='Changes (%)'), # ID61 = GDHI per capita growth (2008=100)
+                ['t1', 't2', 't3', 't4']] *= 100
+JER_Scoreboard_II = getScoreboardData(JER_catalogue)[['IND_CODE','Indicator']]
+cutoff_copy = pd.merge(cutoff_copy, JER_Scoreboard_II, on=['IND_CODE'], how='inner')
+cutoff_copy = cutoff_copy[['year','Indicator','Level or change', 't1', 't2', 't3', 't4']]
+cutoff.to_excel(writer,'Cut_offs II')
 
 # writer.save()
 writer.close() # https://stackoverflow.com/a/76119258
