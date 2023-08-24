@@ -328,3 +328,39 @@ Dim r As Integer
     Next I
 
 End Sub
+
+Option Explicit
+
+Sub fillpattern()
+'
+' fillpattern Macro
+'
+
+'
+    ActiveWindow.ActivateNext
+    Range("C10:H10").Select
+    With Selection.Interior
+        .Pattern = xlLightUp
+        .PatternColorIndex = xlAutomatic
+        .Color = 14277081
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+End Sub
+Sub Macro2()
+'
+' Macro2 Macro
+'
+
+'
+    Range("E11").Select
+    ActiveWindow.ActivateNext
+    Range("C10:H10").Select
+    With Selection.Interior
+        .Pattern = xlLightDown
+        .PatternColorIndex = xlAutomatic
+        .Color = 14277081
+        .TintAndShade = 0
+        .PatternTintAndShade = 0
+    End With
+End Sub
