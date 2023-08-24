@@ -186,12 +186,16 @@ Dim WS_Count As Integer
 Dim I As Integer
 Dim sh_name As String
 Dim freq As String
+Dim rng As Range
+Dim cell As Range
 
     'freq = InputBox("Are these quarterly or yearly indicators? Type q for quarterly or y for yearly")
 
     Windows("static_scoreboard.xlsx").Activate
     'Windows("static_scoreboard_q.xlsx").Activate
+    Application.DisplayAlerts = False
     Sheets("Sheet1").Delete
+    Application.DisplayAlerts = True
     WS_Count = ActiveWorkbook.Worksheets.Count
 
 
@@ -242,7 +246,11 @@ Dim freq As String
     For I = 1 To WS_Count
 
         Worksheets(I).Activate
-        Columns("B:G").ColumnWidth = 32
+        Columns("B:G").ColumnWidth = 24
+        Set rng = ActiveSheet.Range("C10:G14")
+        For Each cell In rng
+            cell.EntireRow.AutoFit
+        Next cell
 
     Next I
 
