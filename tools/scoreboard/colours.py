@@ -125,5 +125,121 @@ for myIndicator in set(data['ind']):
        
 workbook.close()
 
+##############################################################################################
+# Added in August 2023 by Alek -- replaces macro "format_diss02" from "Scoreboard macros.xlsm"
 
+import openpyxl
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Protection, Side
 
+# Helper
+def copy_style(src_cell, dest_cell):
+    # Copy font
+    font = src_cell.font
+    new_font = Font(name=font.name, sz=font.sz, color=font.color,
+                    bold=font.bold, italic=font.italic, vertAlign=font.vertAlign,
+                    underline=font.underline, strike=font.strike, scheme=font.scheme)
+    dest_cell.font = new_font
+    # Copy border
+    border = src_cell.border
+    new_border = Border(left=border.left, right=border.right, top=border.top,
+                        bottom=border.bottom, diagonal=border.diagonal,
+                        diagonal_direction=border.diagonal_direction,
+                        outline=border.outline, start=border.start, end=border.end)
+    dest_cell.border = new_border
+    # Copy alignment
+    alignment = src_cell.alignment
+    new_alignment = Alignment(horizontal=alignment.horizontal, vertical=alignment.vertical,
+                              text_rotation=alignment.text_rotation, wrap_text=alignment.wrap_text,
+                              shrink_to_fit=alignment.shrink_to_fit, indent=alignment.indent)
+    dest_cell.alignment = new_alignment
+    # Copy fill
+    fill = src_cell.fill
+    new_fill = PatternFill(fill_type=fill.fill_type, start_color=fill.start_color,
+                           end_color=fill.end_color, fgColor=fill.fgColor)
+    dest_cell.fill = new_fill
+    # Copy number format (this is directly assignable)
+    dest_cell.number_format = src_cell.number_format
+    # Copy protection
+    protection = src_cell.protection
+    new_protection = Protection(locked=protection.locked, hidden=protection.hidden)
+    dest_cell.protection = new_protection
+
+# Import worksheet "All" and transpose
+current_wb = openpyxl.load_workbook(localpath+"COLOURS.xlsx")
+current_sheet = current_wb['All']
+new_wb = openpyxl.Workbook()
+new_sheet = new_wb['Sheet']
+new_sheet.title = 'All'
+for row in range(1, current_sheet.max_row + 1):
+  for col in range(1, current_sheet.max_column + 1):
+    old_cell = current_sheet.cell(row, col)
+    new_cell = new_sheet.cell(col, row)
+    new_cell.value = old_cell.value
+    copy_style(old_cell, new_cell)
+
+# Sort by IDs
+new_sheet.delete_rows(1) # Empty
+new_sheet.cell(1, 1).value ='ID0' # needed for sorting
+all_rows = [row for row in new_sheet.iter_rows(values_only=True)]
+sorted_rows = sorted(all_rows, key=lambda row: int(row[0][2:]))
+all_rows_sorted = sorted(all_rows, key=lambda row: int(row[0][2:]))
+for row in new_sheet.iter_rows(): # clean-up
+    for cell in row:
+        cell.value = None
+for row_index, row_items in enumerate(all_rows_sorted, 1):  # 1-based indexing for worksheets
+    for col_index, cell_value in enumerate(row_items, 1):
+        new_sheet.cell(row=row_index, column=col_index, value=cell_value)
+
+# Replace ID codes with indicator names
+correspondence_dict = pd.read_csv(localpath+"SCORES.csv",
+                                  usecols=["code","indicator"]).drop_duplicates().set_index('code')['indicator'].to_dict()
+correspondence_dict['ID0'] = ""
+for row in new_sheet.iter_rows(min_col=1, max_col=1, values_only=False):  # Ensure values_only = False
+    cell = row[0]
+    if cell.value in correspondence_dict:
+        cell.value = correspondence_dict[cell.value]
+
+# Insert column with the 3 broad indicator categories
+new_sheet.insert_cols(idx=1)
+beige_fill = PatternFill(start_color="F5F5DC", end_color="F5F5DC", fill_type="solid")
+thin_border = Border(left=Side(style='thin'),
+                     right=Side(style='thin'),
+                     top=Side(style='thin'),
+                     bottom=Side(style='thin'))
+new_sheet.merge_cells('A2:A6')
+new_sheet['A2'].value = "Equal opportunities"
+new_sheet['A2'].fill = beige_fill
+new_sheet.merge_cells('A7:A10')
+new_sheet['A7'].value = "Fair working conditions"
+new_sheet['A7'].fill = beige_fill
+new_sheet.merge_cells('A11:A17')
+new_sheet['A11'].value = "Social protection and inclusion"
+new_sheet['A11'].fill = beige_fill
+
+# Add the column with years
+indics_years = pd.read_csv(localpath+"SCORES.csv",
+                           usecols=["code", "year"]).drop_duplicates()
+indics_years['code'] = pd.Categorical(indics_years['code'],
+                                      categories=list(correspondence_dict.keys()), ordered=True)
+indics_years = indics_years.sort_values(by='code')
+new_sheet.insert_cols(idx=3)
+for index, value in enumerate(indics_years['year'], start=2):
+    new_sheet.cell(row=index, column=3).value = value
+
+# Apply styles
+bold_font = Font(bold=True)
+centered_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+for col in range(1, 4):  # Columns are 1-indexed in openpyxl
+    for row in range(1, new_sheet.max_row + 1):
+        cell = new_sheet.cell(row=row, column=col)
+        cell.font = bold_font
+        cell.alignment = centered_alignment
+        cell.border = thin_border
+new_sheet.column_dimensions['B'].width = 35 # Indicator names
+new_sheet.column_dimensions['C'].width = 7 # Years
+for l in ['A', 'D','E','F','G','H','I','J']:
+    new_sheet.column_dimensions[l].width = 20
+
+new_sheet.sheet_view.zoomScale = 80
+
+new_wb.save(localpath+"COLOURS.xlsx")
