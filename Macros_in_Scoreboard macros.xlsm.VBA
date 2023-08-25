@@ -267,6 +267,9 @@ Dim I As Integer
 Dim WS_Count As Integer
 Dim MS As String
 Dim r As Integer
+Dim currentDate As String
+
+    currentDate = Format(Date, "dd mmmm yyyy")
 
     Windows("SCATTER.csv").Activate
 
@@ -324,12 +327,19 @@ Dim r As Integer
 
         Range("C2:I17").FormatConditions.Delete
         Range("R2:R17").Delete
+        Range("A19").Value = Replace(Range("A19").Value, "DD MMMM YYYY", currentDate)
+        Range("I2:I17").Borders(xlInsideHorizontal).LineStyle = xlContinuous
+        Range("I2:I17").Borders(xlInsideHorizontal).Weight = xlThin
 
     Next I
 
+    Windows("SCATTER.csv").Activate
+    DeleteColumnByTitle ("ind_num") ' clean-up
+    Windows("Template.xlsx").Activate
+
 End Sub
 
-Option Explicit
+' Option Explicit
 
 Sub fillpattern()
 '
@@ -364,3 +374,25 @@ Sub Macro2()
         .PatternTintAndShade = 0
     End With
 End Sub
+
+
+Sub DeleteColumnByTitle(colTitle As String)
+    Dim ws As Worksheet
+    Dim col As Range
+    Dim lastCol As Long
+
+    ' Set the active worksheet to a variable
+    Set ws = ActiveSheet
+
+    ' Find the last used column in the first row
+    lastCol = ws.Cells(1, ws.Columns.Count).End(xlToLeft).Column
+
+    ' Loop through each cell in the first row to find the column with the given title
+    For Each col In ws.Range(ws.Cells(1, 1), ws.Cells(1, lastCol))
+        If col.Value = colTitle Then
+            col.EntireColumn.Delete
+            Exit For
+        End If
+    Next col
+End Sub
+
