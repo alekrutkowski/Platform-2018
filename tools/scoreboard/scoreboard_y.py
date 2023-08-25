@@ -32,32 +32,32 @@ def calculate_score(df, column_name, ref_Point, y, ID):
     wk_data=wk_data[wk_data.geo.isin(CtryList)]
     #indicator = set(wk_data['Indicator']).pop()
     score_mean=0
-    score_std=0  
+    score_std=0
     sense=getField(ID, 'sense')
     # Non-weighted EU28 average
     #TODO: replace nulls in the catalogue by the real value 'avg'
     if ref_Point=='avg' or ref_Point=='':
-        score_mean=wk_data[column_name].mean()          
+        score_mean=wk_data[column_name].mean()
     elif ref_Point=='EU27_2020':
-        score_mean=df[df.geo=='EU27_2020'].iloc[0][column_name] 
+        score_mean=df[df.geo=='EU27_2020'].iloc[0][column_name]
     elif np.isreal(ref_Point):
         score_mean=ref_Point
     else:
         Exception("No valid Reference point defined for indicator" + ID)
-            
+
     score_std=(((df[column_name]-score_mean)**2).sum()/(df[column_name].count()))**0.5
     #print(ID, column_name, ref_Point, round(score_mean,2), round(score_std,2) )
-    df['score_'+column_name]= (df[column_name]- score_mean) / score_std 
+    df['score_'+column_name]= (df[column_name]- score_mean) / score_std
     if sense =='neg':
         df['score_'+column_name]= -1*df['score_'+column_name]
 #    cutoff.loc[len(cutoff)] = [ID, column_name, ref_Point, round(float(score_mean)), round(float(score_std)),round(float(score_mean-score_std)),round(float(score_mean-score_std/2)),round(float(score_mean+score_std/2)),round(float(score_mean+score_std))]
     cutoff.loc[len(cutoff)] = [ID, y, score_mean, score_std, score_mean-score_std ,score_mean-score_std/2, score_mean+score_std/2, score_mean+score_std]
 
-    return df 
+    return df
 # cutoff = pd.DataFrame(columns=('Indicator', 'type', 'refPoint', 'mean', 'std','t1','t2','t3','t4'))
 
 # Set categories
-def getCategories(x):    
+def getCategories(x):
     myLevel = x['score_value_n']
     myChange = x['score_ychange']
     if myLevel < -1 and myChange < 1:
@@ -69,28 +69,28 @@ def getCategories(x):
     elif (0.5 <= myLevel < 1) or (myLevel >= 1 and myChange <-1) or ( -0.5 <= myLevel < 0.5 and  myChange >= 1):
         return 4 #'lime'
     elif myLevel >= 1 and myChange >= -1:
-        return 5 #'g'    
+        return 5 #'g'
     else:
         return 'c'
-        
+
 # Labels for levels
-def getLabelsLevel(x):    
+def getLabelsLevel(x):
     myLevel = x['score_value_n']
-    if myLevel < -1: return 'Very low' 
-    elif (-1 <= myLevel < -0.5): return 'Low' 
+    if myLevel < -1: return 'Very low'
+    elif (-1 <= myLevel < -0.5): return 'Low'
     elif ( -0.5 <= myLevel < 0.5): return 'On average'
-    elif (0.5 <= myLevel < 1): return 'High' 
-    elif myLevel >= 1: return 'Very high'    
+    elif (0.5 <= myLevel < 1): return 'High'
+    elif myLevel >= 1: return 'Very high'
     else: return 'c'
 
 # Labels for changes
-def getLabelsChanges(x):    
+def getLabelsChanges(x):
     myLevel = x['score_ychange']
-    if myLevel < -1: return 'Much lower than average' 
-    elif (-1 <= myLevel < -0.5): return 'Lower than average' 
+    if myLevel < -1: return 'Much lower than average'
+    elif (-1 <= myLevel < -0.5): return 'Lower than average'
     elif ( -0.5 <= myLevel < 0.5): return 'On average'
-    elif (0.5 <= myLevel < 1): return 'Higher than average' 
-    elif myLevel >= 1: return 'Much higher than average'    
+    elif (0.5 <= myLevel < 1): return 'Higher than average'
+    elif myLevel >= 1: return 'Much higher than average'
     else: return 'c'
 
 
@@ -124,10 +124,10 @@ def setLastYear(dataset):
         elif(indic == 'ID118'):
             year=2022
         else:
-            year = dataset[(dataset.IND_CODE==indic) & (dataset.geo=='EU27_2020') & (~dataset.value_n.isnull())].year.max() 
+            year = dataset[(dataset.IND_CODE==indic) & (dataset.geo=='EU27_2020') & (~dataset.value_n.isnull())].year.max()
         setField(indic,'lastYear',year)
     return dataset
-    
+
 # ******************  END definitions  **************************************************
 
 # ********************   MAIN PROGRAM    ************************************************
@@ -138,16 +138,17 @@ def setLastYear(dataset):
 # Load catalogue
 for i in range(1):
     print('')
-catalogueJER=pd.read_csv(root_path_n+JER_catalogue)  # open the catalogue into a data frame - from G drive  
-catalogueJER = catalogueJER.fillna('')              # deletes NaNs and fill the gaps 
+catalogueJER=pd.read_csv(root_path_n+JER_catalogue)  # open the catalogue into a data frame - from G drive
+catalogueJER = catalogueJER.fillna('')              # deletes NaNs and fill the gaps
 codes=set(catalogueJER['IND_CODE'])
 
 # extract data
 JER_Scoreboard = getScoreboardData(JER_catalogue)
+JER_Scoreboard_II = JER_Scoreboard.copy()
 
 #inserting "last year" in the catalogue
 catalogueJER.set_index('IND_CODE',inplace=True)
-JER_Scoreboard = setLastYear(JER_Scoreboard) 
+JER_Scoreboard = setLastYear(JER_Scoreboard)
 catalogueJER.reset_index(inplace=True)
 
 # Save all data
@@ -189,7 +190,7 @@ print('Calculating annual changes for headline indicators...')
 changes = pd.DataFrame()
 for indic in set(JER_Scoreboard_h['IND_CODE']):
     print('Calculating  annual changes for the indicator '+indic+'...')
-    for country in CtryList: 
+    for country in CtryList:
         ch=''
         tmp = JER_Scoreboard_h[(JER_Scoreboard_h.IND_CODE==indic) & (JER_Scoreboard_h.geo==country)]
         tmp['flag']=tmp['flag'].replace(np.nan,'')
@@ -207,27 +208,27 @@ for indic in set(JER_Scoreboard_h['IND_CODE']):
 # Overwrite the changes for mixed indicators from the external file: net earnings! HARD CODED the rank of the indicator
 #changes = changes[(changes.IND_CODE != 'ID74')] #delete first that indicator - HARD CODED
 #net_earnings = pd.read_csv(calculated_path+'net_earnings.csv')
-#changes = changes.append(net_earnings) 
+#changes = changes.append(net_earnings)
 
-changes.to_csv(localpath+'changes.csv',index=False, float_format='%.4f') 
-      
+changes.to_csv(localpath+'changes.csv',index=False, float_format='%.4f')
+
 # Calculate scores for annual changes
 for i in range(2):
     print('')
 print('Calculating scores for annual changes - headline indicators...')
-scoresD = pd.DataFrame()        
+scoresD = pd.DataFrame()
 for indic in set(changes['IND_CODE']):
     print('Calculating  scores for the indicator '+indic+'...')
-    for year in set(changes['year']): 
-        tmp = changes[(changes.IND_CODE==indic) & (changes.year==year)]        
+    for year in set(changes['year']):
+        tmp = changes[(changes.IND_CODE==indic) & (changes.year==year)]
         # scoresD = scoresD.append(calculate_score(tmp, 'ychange', 'avg', year, indic))
         scoresD = pd.concat([scoresD, calculate_score(tmp, 'ychange', 'avg', year, indic)], ignore_index=True)  # https://stackoverflow.com/a/75956237
-        
+
 #scoresD = scoresD[(scoresD.geo.isin(CtryList))]
 scoresD = scoresD[['IND_CODE','Indicator','geo','year','ychange','ychange_flag','score_ychange']]
 
 # Merge scores for levels with scores for differences
-scores = pd.merge(scores,scoresD,on=['IND_CODE','Indicator','geo','year'])     
+scores = pd.merge(scores,scoresD,on=['IND_CODE','Indicator','geo','year'])
 
 #Calculate color categories and apply labels
 #scores=scores[(scores.year>=2015)]
@@ -282,7 +283,7 @@ i=0
 for indic in set(JER_Scoreboard_b['IND_CODE']):
     i+=1
     print('Producing data for the last three years for indicator '+str(i)+' out of 121 - '+indic+'...')
-    for country in ExCtryList: 
+    for country in ExCtryList:
         ch=''
         tmp = JER_Scoreboard_b[(JER_Scoreboard_b.IND_CODE==indic) & (JER_Scoreboard_b.geo==country)]
         tmp['flag']=tmp['flag'].replace(np.nan,'')
@@ -295,11 +296,11 @@ for indic in set(JER_Scoreboard_b['IND_CODE']):
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
         # changes=changes.append(tmp)
         changes = pd.concat([changes, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
-        
+
 changes = changes[['IND_CODE','geo','year','ychange','ychange_flag']]
 
 # This file will contains levels and changes for all indicators, all years but only EU countries. Plus, the yearly changes for all
-JER_Scoreboard_b = pd.merge(JER_Scoreboard_b,changes,on=['IND_CODE','geo','year']) 
+JER_Scoreboard_b = pd.merge(JER_Scoreboard_b,changes,on=['IND_CODE','geo','year'])
 
 # Save levels and changes
 JER_Scoreboard_b.to_csv(localpath+'JER_scoreboard_data_b.csv') # Data on levels and changes saved: all indicators, all EU countries
@@ -332,10 +333,10 @@ JER_Scoreboard_diff = pd.DataFrame()
 for indic in set(JER_Scoreboard['IND_CODE']):
     print('Calculating differences for indicator...'+indic+'...')
     for year in set(JER_Scoreboard['year']):
-        
+
 #See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
 #   aggEU['geo']='EUnw'
-# /Users/fabioraffa/Documents/Fabio Work/Platform 2018/tools/scoreboard/scoreboard_y.py:334: SettingWithCopyWarning: 
+# /Users/fabioraffa/Documents/Fabio Work/Platform 2018/tools/scoreboard/scoreboard_y.py:334: SettingWithCopyWarning:
 # A value is trying to be set on a copy of a slice from a DataFrame.
 # Try using .loc[row_indexer,col_indexer] = value instead
 
@@ -357,14 +358,14 @@ for indic in set(JER_Scoreboard['IND_CODE']):
         # tmpEU = tmpEU.append(aggEA)
         tmpEU = pd.concat([tmpEU, aggEA], ignore_index=True)  # https://stackoverflow.com/a/75956237
         tmpEU['EUnwL'] = aggEU['value_n'].mean()
-        tmpEU['EUnwD'] = aggEU['ychange'].mean() 
+        tmpEU['EUnwD'] = aggEU['ychange'].mean()
         tmpEU['DistEU'] = tmpEU['value_n'] - tmpEU['EUnwL']
         tmpEU['DiffMSEU'] = tmpEU['ychange'] - tmpEU['EUnwD']
         # JER_Scoreboard_diff = JER_Scoreboard_diff.append(tmpEU)
         JER_Scoreboard_diff = pd.concat([JER_Scoreboard_diff, tmpEU], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
 JER_Scoreboard_diff['flag']=JER_Scoreboard_diff['flag'].replace(np.nan,'')
-JER_Scoreboard_diff['ychange_flag']=JER_Scoreboard_diff['ychange_flag'].replace(np.nan,'')    
+JER_Scoreboard_diff['ychange_flag']=JER_Scoreboard_diff['ychange_flag'].replace(np.nan,'')
 JER_Scoreboard_diff.to_csv(localpath+'JER_scoreboard_diff_check.csv')
 JER_Scoreboard_diff = JER_Scoreboard_diff[['IND_CODE','Indicator','type','Order','change','geo','year','value_n','flag','ychange','ychange_flag','DistEU','DiffMSEU']]
 headline = JER_Scoreboard_diff[JER_Scoreboard_diff.type=='H']
@@ -426,7 +427,7 @@ for indic in set(compare.IND_CODE) :
     tmp=compare[(compare.IND_CODE==indic) &((compare.year==2008) | (compare.year==2013) | (compare.year==pd.to_numeric(year)))]
     # comp=comp.append(tmp)
     comp = pd.concat([comp, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
-compare=comp.sort_values('Order')    
+compare=comp.sort_values('Order')
 pivotc=pd.pivot_table(compare,values='value_n',index=['rank','geo'],columns=['Order','Indicator','year'])
 
 scores = pd.merge(ranking,scores,on=['geo'])
@@ -456,7 +457,7 @@ for indic in set(table.IND_CODE) :
     tmp=table[(table.IND_CODE==indic) &((table.year==2008) | (table.year==2013) | (table.year==pd.to_numeric(yr)))]
     # diff=diff.append(tmp)
     diff = pd.concat([diff, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
-table=diff.sort_values('Order') 
+table=diff.sort_values('Order')
 
 pivot_diff = pd.pivot_table(table,values='value',index=['rank','geo'],columns=['Order','Indicator','year','diff'])
 pivot_diff=pivot_diff.reset_index()
@@ -492,17 +493,20 @@ cutoff_copy.drop('cum_count', axis=1, inplace=True)
 cutoff_copy = cutoff_copy[['Indicator', 'year', 'Level or change', 't1', 't2', 't3', 't4']]
 non_missing_rows = cutoff_copy.dropna(subset=['t1', 't2', 't3', 't4'])
 max_years = non_missing_rows.groupby(['Indicator','Level or change'])['year'].max().reset_index()
-cutoff_copy = pd.merge(cutoff_copy, max_years, on=['Indicator', 'year'], how='inner')
+cutoff_copy = pd.merge(cutoff_copy, max_years, on=['Indicator','Level or change','year'], how='inner')
 cutoff_copy.drop('year', axis=1, inplace=True)
 cutoff_copy = cutoff_copy.rename(columns={'Indicator': 'IND_CODE'})
 cutoff_copy.loc[(cutoff_copy['IND_CODE']=='ID61') & (cutoff_copy['Level or change']=='Changes'), # ID61 = GDHI per capita growth (2008=100)
                 'Level or change'] = 'Changes (%)'
 cutoff_copy.loc[(cutoff_copy['IND_CODE']=='ID61') & (cutoff_copy['Level or change']=='Changes (%)'), # ID61 = GDHI per capita growth (2008=100)
                 ['t1', 't2', 't3', 't4']] *= 100
-JER_Scoreboard_II = getScoreboardData(JER_catalogue)[['IND_CODE','Indicator']]
-cutoff_copy = pd.merge(cutoff_copy, JER_Scoreboard_II, on=['IND_CODE'], how='inner')
-cutoff_copy = cutoff_copy[['year','Indicator','Level or change', 't1', 't2', 't3', 't4']]
-cutoff.to_excel(writer,'Cut_offs II')
+cutoff_copy = pd.merge(cutoff_copy, JER_Scoreboard_II[['IND_CODE','Indicator']].drop_duplicates(),
+                       on=['IND_CODE'], how='inner')
+cutoff_copy['IND_CODE_num'] = cutoff_copy['IND_CODE'].str.extract('(\d+)').astype(int)
+cutoff_copy.sort_values(by=['IND_CODE_num', 'Indicator'], ascending=[True, True], inplace=True)
+cutoff_copy.drop('IND_CODE_num', axis=1, inplace=True)
+cutoff_copy = cutoff_copy[['Indicator','Level or change', 't1', 't2', 't3', 't4']]
+cutoff_copy.to_excel(writer,'Cut_offs II', index=False)
 
 # writer.save()
 writer.close() # https://stackoverflow.com/a/76119258

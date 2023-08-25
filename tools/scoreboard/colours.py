@@ -167,7 +167,7 @@ def copy_style(src_cell, dest_cell):
 # Import worksheet "All" and transpose
 current_wb = openpyxl.load_workbook(localpath+"COLOURS.xlsx")
 current_sheet = current_wb['All']
-new_sheet = current_wb.create_sheet(title='All (transposed)',0) # 0 = at the first position
+new_sheet = current_wb.create_sheet(title='All (transposed)',index=0) # 0 = at the first position
 for row in range(1, current_sheet.max_row + 1):
   for col in range(1, current_sheet.max_column + 1):
     old_cell = current_sheet.cell(row, col)

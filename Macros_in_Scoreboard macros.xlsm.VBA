@@ -5,7 +5,7 @@ Dim I As Integer, c As Integer
 Dim bookmarks As Range
 
     Windows("output.xlsx").Activate
-    WS_Count = ActiveWorkbook.Worksheets.Count
+    WS_Count = ActiveWorkbook.Worksheets.Count - 1 ' -1 because to avoid touching sheet "Cut_offs II"
 
     For I = 1 To WS_Count
 
@@ -130,6 +130,11 @@ Dim bookmarks As Range
 
     Workbooks("bookmarks.csv").Close
 
+    Windows("output.xlsx").Activate
+    Worksheets("Cut_offs II").Range("C2:F32").NumberFormat = "0.0"
+    Worksheets("Cut_offs II").Columns(1).AutoFit
+    Worksheets("Cut_offs II").Columns(2).AutoFit
+
 
 End Sub
 Sub format_disso2()
@@ -180,8 +185,6 @@ Dim ids As Range, cell As Range, indicators As Range
     Windows("Headline indicators table.csv").Close
 
 End Sub
-
-
 Sub format_disso3()
 
 Dim WS_Count As Integer
@@ -195,9 +198,20 @@ Dim cell As Range
 
     Windows("static_scoreboard.xlsx").Activate
     'Windows("static_scoreboard_q.xlsx").Activate
-    Application.DisplayAlerts = False
-    Sheets("Sheet1").Delete
-    Application.DisplayAlerts = True
+    Dim ws As Worksheet
+    ' Loop through each worksheet in reverse order
+    ' Reverse order is used to avoid skipping sheets when deleting
+    For I = Sheets.Count To 1 Step -1
+        Set ws = Sheets(I)
+        ' Check if the name of the worksheet starts with "Sheet"
+        If ws.Name Like "Sheet*" Then
+            Application.DisplayAlerts = False ' Disable alerts to avoid confirmation dialog
+            ws.Delete
+            Application.DisplayAlerts = True  ' Enable alerts again
+        End If
+    Next I
+
+
     WS_Count = ActiveWorkbook.Worksheets.Count
 
 
@@ -397,4 +411,5 @@ Sub DeleteColumnByTitle(colTitle As String)
         End If
     Next col
 End Sub
+
 
