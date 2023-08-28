@@ -346,6 +346,8 @@ Dim currentDate As String
         Range("A19").Value = Replace(Range("A19").Value, "DD MMMM YYYY", currentDate)
         Range("I2:I17").Borders(xlInsideHorizontal).LineStyle = xlContinuous
         Range("I2:I17").Borders(xlInsideHorizontal).Weight = xlThin
+        Range("I1:I17").Borders(xlEdgeRight).LineStyle = xlContinuous
+        Range("I1:I17").Borders(xlEdgeRight).Weight = xlThin
 
     Next I
 
@@ -412,4 +414,8 @@ Sub DeleteColumnByTitle(colTitle As String)
     Next col
 End Sub
 
-
+Sub testing()
+        ' Placeholder macro for testing new code snippets
+        Range("I1:I17").Borders(xlEdgeRight).LineStyle = xlContinuous
+        Range("I1:I17").Borders(xlEdgeRight).Weight = xlThin
+End Sub

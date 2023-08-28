@@ -11,7 +11,7 @@ from os import path
 import shutil
 from datetime import datetime
 
-CurrentDate = datetime.now().strftime('%Y.%m.%d')
+CurrentDate = datetime.now().strftime('%Y.%m.%d') # e.g. '2023.08.25' #
 
 
 CtryList=['AT','BE','BG','CY','CZ','DE','DK','EE','EL','ES','FI','FR','HR','HU','IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK']

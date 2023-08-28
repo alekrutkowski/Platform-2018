@@ -8,7 +8,7 @@ import xlsxwriter
 from config.parameters import *
 from config.config_scoreboard import *
 from util.download_data import * # David's tool
-
+import re
 
 
 # Data: Datafreme: data,  Scores in columns scoreL and scoreD
@@ -71,7 +71,50 @@ data = data[['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','c
 data.to_csv(localpath+'SCATTER_check.csv',index=False, float_format='%.3f')   
 data = data[['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','category','LabelL','LabelD','colour1']]
 data.columns=['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','category','LabelL','LabelD','colour']
-data.to_csv(localpath+'SCATTER.csv',index=False, float_format='%.3f') 
+data.to_csv(localpath+'SCATTER.csv',index=False, float_format='%.3f')
+
+###### ------ Additional file to feed into worksheet "Input data" in F1's SCF Tables Excel file ------
+print('Preparing For_SCF_tables_Input_Data_worksheet.csv')
+data_for_SCF = data.copy()[['ind','indicator','geo','year','colour']]
+colour_to_int = {
+    'red': 1, # Critical situations
+    'orange': 2, # To watch
+    'yellow': 3, # Weak but improving
+    'blue': 4, # Good but to monitor
+    'white': 5, # On average
+    'green': 6, # Better than average
+    'dark_green': 7 # Best performers
+}
+data_for_SCF['colour_num'] = data_for_SCF['colour'].map(colour_to_int)
+data_for_SCF['ID_int'] = data_for_SCF['ind'].str.extract('(\d+)').astype(int)
+reshaped_data_for_SCF = data_for_SCF.pivot_table(
+    index=['ID_int', 'indicator', 'year'],
+    columns='geo',
+    values='colour_num',
+    aggfunc='sum'
+).reset_index()
+def split_description(description):
+    match_parentheses = re.search(r'(.*)\s(\(.*\))', description) # Check if the description contains suffix/details in parentheses
+    match_index = re.search(r'(.*)\sIndex', description) # Check if the description contains the word "Index"
+    match_age_cohort = re.search(r'(.*)\s15-29 age cohort', description) # Check if the description contains the phrase "15-29 age cohort"
+    if match_parentheses:
+        return match_parentheses.groups()
+    elif match_index:
+        return match_index.group(1), 'Index'
+    elif match_age_cohort:
+        return match_age_cohort.group(1), '15-29 age cohort'
+    else:
+        return description, ""
+reshaped_data_for_SCF['Indicator'], reshaped_data_for_SCF['Details'] = \
+    zip(*reshaped_data_for_SCF['indicator'].apply(split_description))
+reshaped_data_for_SCF.sort_values(by='ID_int', inplace=True)
+country_order_in_columns = ['BE','BG','CZ','DK','DE','EE','IE','EL','ES','FR','HR','IT','CY','LV','LT','LU','HU',
+                            'MT','NL','AT','PL','PT','RO','SI','SK','FI','SE']
+new_column_order = ['Indicator','Details','year'] + country_order_in_columns
+reshaped_data_for_SCF[new_column_order].to_csv(localpath+'For_SCF_tables_Input_Data_worksheet.csv',
+                                               index=False)
+print('Finished For_SCF_tables_Input_Data_worksheet.csv')
+###### -----------------------------------------------------------------------------------------------
     
 worksheet.write(1, 1,     "Best performers", dark_green) 
 worksheet.write(2, 1,     "Better than average", green) 

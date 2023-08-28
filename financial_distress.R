@@ -5,12 +5,14 @@ library(memoise)
 library(kit)
 
 INPUT_FILE <-
+  # To be obtained/requested from: ECFIN-BCS-MAIL@ec.europa.eu;
+  # Roberta.FRIZ@ec.europa.eu; 
   'H:/Data/non_standard/original/DG_EMPL_financial_distress.xls'
 
 eval(bquote(stopifnot(file.exists(.(INPUT_FILE)))))
 
 YEARS_QUARTERS <-
-  expand.grid(1980:2030,
+  expand.grid(1980:2050,
               paste0('Q',1:4)) %>% 
   {paste0(.[[1]],.[[2]])} %>% 
   sort()
