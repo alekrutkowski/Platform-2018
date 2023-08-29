@@ -102,12 +102,12 @@ def prepareFile(file, indicator):
  
 def reIndex(group):
     a=group[group.year==2008]['ratio']    
-    group['value_n']=100*group['ratio']/float(a)
+    group['value_n']=100*group['ratio']/float(a.iloc[0]) # was float(a) => FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
     return group
 
 def reIndexQuarterly(group):
     a=group[group.year.isin(['2012Q1','2012Q2','2012Q3','2012Q4'])]['ratio'].mean()    
-    group['value_n']=100*group['ratio']/float(a)
+    group['value_n']=100*group['ratio']/float(a.iloc[0]) # was float(a) => FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
     return group
 
 def GDHI_per_capita(realData, time, column):
@@ -191,9 +191,9 @@ def GDHI_EUR_per_capita():
         per_capita['value_n']=per_capita['ratio']*1000
         per_capita.to_csv(calculated_path+'real_GDHI_'+my_time+'_per_capita_EUR.csv',index=False, float_format='%.3f')
 
-#yearlyGDHI()
+# yearlyGDHI()
 quarterlyGDHI()
-#GDHI_EUR_per_capita()
+GDHI_EUR_per_capita()
 
 #TO DO: PRODUCE QUARTERLY GDHI SCA
 #comment in/out NSA and SCA quarterly calculations or create "switch"

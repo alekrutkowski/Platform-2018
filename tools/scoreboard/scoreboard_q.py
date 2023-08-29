@@ -118,6 +118,7 @@ def setLastYear(dataset):
 # Load catalogue
 for i in range(2):
     print('')
+JER_catalogue_q = 'catalogue - JER Scoreboard_quarterly.csv'
 catalogueJER=pd.read_csv(root_path_n+JER_catalogue_q)  # open the catalogue into a data frame - from G drive  
 catalogueJER = catalogueJER.fillna('')              # deletes NaNs and fill the gaps 
 codes=set(catalogueJER['IND_CODE'])
