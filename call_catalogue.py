@@ -9,6 +9,7 @@ Created on Mon Jul  7 10:26:47 2014
 from formula_engine.engine_v2 import *
 from util.tools import *
 from util.catalogues import *
+import numpy as np
 
 #Import specific indicators
 #from Indicators.ghdi_esa2010 import *
@@ -145,9 +146,10 @@ def quarterly():
     # 1) Filter years smaller than 2000    
     finalData=filterByYear(finalData, 2007)
     
-    finalData['period_type']=finalData['year'].str[4:5]
+    finalData['period_type']=finalData['year'].str[5:6].str.replace('-',"")
+    finalData['period_type']=np.where(finalData['period_type']!='Q', 'M', 'Q')
     finalData['y']=finalData['year'].str[0:4]
-    finalData['q_m']=finalData['year'].str[4:]
+    finalData['q_m']=finalData['year'].str[4:].str.replace('-',"")
     
     save_sync(finalData,'quarterly_recurrent')
 
@@ -155,7 +157,7 @@ def quarterly():
 #comment-in the lines related to the excels to be extracted
 
 #a=quick_excel(['PL'], 'PL_ad_hoc.csv','PL_ad_hoc')
-#quarterly()
+quarterly()
 #quarterlyannex=anyCatalogue('Quarterly Annex - catalogue.csv', 'quarterly_annex_data', FX_FR=True)
 #data=EuropeanSemester()
 #enlargement_yearly()
