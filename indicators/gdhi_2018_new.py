@@ -9,7 +9,7 @@ from util.tools import *
 
 #Configuration
 cod_comp=['GDHI','COMPEMP','COMPSLFEMP','NETPROPINC','OTCURTRANS','TAXINC','SOCBEN']
-EU27=['AT','BE','BG','CY','CZ','DE','DK','EE','EL','ES','FI','FR','HR','HU','IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK','EU27_2020', 'EA19']
+EU27=['AT','BE','BG','CY','CZ','DE','DK','EE','EL','ES','FI','FR','HR','HU','IE','IT','LT','LU','LV','MT','NL','PL','PT','RO','SE','SI','SK','EU27_2020', 'EA20']
 
 components={}
 components['GDHI']=['B6G','RECV'] #'Gross disposable household income'
@@ -102,12 +102,12 @@ def prepareFile(file, indicator):
  
 def reIndex(group):
     a=group[group.year==2008]['ratio']    
-    group['value_n']=100*group['ratio']/float(a.iloc[0]) # was float(a) => FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+    group['value_n']=100*group['ratio']/float(a)
     return group
 
 def reIndexQuarterly(group):
-    a=group[group.year.isin(['2012Q1','2012Q2','2012Q3','2012Q4'])]['ratio'].mean()    
-    group['value_n']=100*group['ratio']/float(a.iloc[0]) # was float(a) => FutureWarning: Calling float on a single element Series is deprecated and will raise a TypeError in the future. Use float(ser.iloc[0]) instead
+    a=group[group.year.isin(['2012-Q1','2012-Q2','2012-Q3','2012-Q4'])]['ratio'].mean()
+    group['value_n']=100*group['ratio']/float(a)
     return group
 
 def GDHI_per_capita(realData, time, column):
