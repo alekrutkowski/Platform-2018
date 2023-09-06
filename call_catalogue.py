@@ -89,6 +89,10 @@ def anyCatalogue(cat_standard, file_output, lite=True, FX_FR=False, join_labels=
         cat=pd.read_csv(root_path_n+cat_standard)
         mergedFile=pd.merge(cat[['IND_CODE','order','Indicator',]], mergedFile, left_on=['IND_CODE'], right_on=['IndicatorID'],how='right')
         mergedFile=mergedFile.drop(['IND_CODE'], axis=1)
+
+    if file_output=='quarterly_annex_data':
+        mergedFile['year'] = mergedFile['year'].str.replace('-',"") # Excel file "U:\04 Data and tools\Reports\quarterly\Statistical annex quarterly_A.xlsx" doesn't like the new quarterly format with hyphen
+
     #Run specific actions in the data file   
     save_sync(mergedFile,file_output)
     
@@ -157,8 +161,8 @@ def quarterly():
 #comment-in the lines related to the excels to be extracted
 
 #a=quick_excel(['PL'], 'PL_ad_hoc.csv','PL_ad_hoc')
-quarterly()
-#quarterlyannex=anyCatalogue('Quarterly Annex - catalogue.csv', 'quarterly_annex_data', FX_FR=True)
+#quarterly()
+quarterlyannex=anyCatalogue('Quarterly Annex - catalogue.csv', 'quarterly_annex_data', FX_FR=True)
 #data=EuropeanSemester()
 #enlargement_yearly()
 #esde=anyCatalogue('ESDE annex - catalogue.csv', 'esde_annex', FX_FR=True)
