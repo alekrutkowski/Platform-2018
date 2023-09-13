@@ -246,6 +246,10 @@ for indic in set(scores['IND_CODE']):
     # JER_Scores = JER_Scores.append(tmp)
     JER_Scores = pd.concat([JER_Scores, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
+# For the SCF file
+scores.columns=['code','indicator','type','Order','lastYear','sense','change','group','geo','year','level','flag','scoreL','ydiff','ydiff_flag','scoreD','category','LabelL','LabelD']
+scores.to_csv(localpath+'SCORES_all_years.csv')   # Scores saved: headline indicators, all countries, all years
+
 scores= JER_Scores
 # Prepare the dataframe for saving
 scores.columns=['code','indicator','type','Order','lastYear','sense','change','group','geo','year','level','flag','scoreL','ydiff','ydiff_flag','scoreD','category','LabelL','LabelD']

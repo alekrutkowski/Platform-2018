@@ -75,7 +75,13 @@ data.to_csv(localpath+'SCATTER.csv',index=False, float_format='%.3f')
 
 ###### ------ Additional file to feed into worksheet "Input data" in F1's SCF Tables Excel file ------
 print('Preparing For_SCF_tables_Input_Data_worksheet.csv')
-data_for_SCF = data.copy()[['ind','indicator','geo','year','colour']]
+data_for_SCF=pd.read_csv(localpath+"SCORES_all_years.csv")
+data_for_SCF['colour']=data_for_SCF.apply(getColorGroup, axis=1)
+data_for_SCF['colour1']=data_for_SCF.apply(getException, axis=1)
+data_for_SCF['ind'] = 'ID'+data_for_SCF.Order.astype(str)
+data_for_SCF = data_for_SCF[['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','category','LabelL','LabelD','colour1']]
+data_for_SCF.columns=['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','category','LabelL','LabelD','colour']
+data_for_SCF = data_for_SCF[['ind','indicator','geo','year','colour']]
 colour_to_int = {
     'red': 1, # Critical situations
     'orange': 2, # To watch
@@ -107,7 +113,7 @@ def split_description(description):
         return description, ""
 reshaped_data_for_SCF['Indicator'], reshaped_data_for_SCF['Details'] = \
     zip(*reshaped_data_for_SCF['indicator'].apply(split_description))
-reshaped_data_for_SCF.sort_values(by='ID_int', inplace=True)
+reshaped_data_for_SCF.sort_values(by=['year','ID_int'], inplace=True)
 country_order_in_columns = ['BE','BG','CZ','DK','DE','EE','IE','EL','ES','FR','HR','IT','CY','LV','LT','LU','HU',
                             'MT','NL','AT','PL','PT','RO','SI','SK','FI','SE']
 new_column_order = ['Indicator','Details','year'] + country_order_in_columns
