@@ -201,6 +201,9 @@ for indic in set(JER_Scoreboard_h['IND_CODE']):
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
+        if (tmp['IND_CODE'] == 'ID4').any(): # if not empty
+            tmp.loc[(tmp['IND_CODE']=='ID4') & tmp['value_n'].notna(),
+                    'ychange'] = 0 # EXCEPTIONAL - TEMPORARY !!! ★
         # changes=changes.append(tmp)
         changes = pd.concat([changes, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
@@ -246,14 +249,18 @@ for indic in set(scores['IND_CODE']):
     # JER_Scores = JER_Scores.append(tmp)
     JER_Scores = pd.concat([JER_Scores, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
-# For the SCF file
+# For the SCF file - ID122 to be included here
 scores.columns=['code','indicator','type','Order','lastYear','sense','change','group','geo','year','level','flag','scoreL','ydiff','ydiff_flag','scoreD','category','LabelL','LabelD']
 scores.to_csv(localpath+'SCORES_all_years.csv')   # Scores saved: headline indicators, all countries, all years
 
 scores= JER_Scores
 # Prepare the dataframe for saving
 scores.columns=['code','indicator','type','Order','lastYear','sense','change','group','geo','year','level','flag','scoreL','ydiff','ydiff_flag','scoreD','category','LabelL','LabelD']
-
+scores = scores[scores['code']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
+scores.loc[(scores['code']=='ID4') & (scores['ydiff']==0),
+           'scoreD'] = 0  # EXCEPTIONAL - TEMPORARY !!! ★
+scores.loc[(scores['code']=='ID4') & (scores['ydiff']==0),
+           'LabelD'] = 'On average'  # EXCEPTIONAL - TEMPORARY !!! ★
 # Save the scores
 scores.to_csv(localpath+'SCORES.csv')   # Scores saved: headline indicators, all countries, last year only
 
@@ -275,6 +282,7 @@ writer.close() # https://stackoverflow.com/a/76119258
 
 JER_Scoreboard_b=pd.read_csv(localpath+extractionFile)
 JER_Scoreboard_b = JER_Scoreboard_b[['IND_CODE','Indicator','type','Order','change','geo','year','value_n','flag']]
+JER_Scoreboard_b = JER_Scoreboard_b[JER_Scoreboard_b['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
 
 # Calculate annual changes
 for i in range(1):
@@ -298,6 +306,9 @@ for indic in set(JER_Scoreboard_b['IND_CODE']):
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
+        if (tmp['IND_CODE'] == 'ID4').any(): # if not empty
+            tmp.loc[(tmp['IND_CODE']=='ID4') & tmp['value_n'].notna(),
+                    'ychange'] = 0 # EXCEPTIONAL - TEMPORARY !!! ★
         # changes=changes.append(tmp)
         changes = pd.concat([changes, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
@@ -325,6 +336,7 @@ ranking = pd.read_csv(localpath+'Countries_ranking.csv')
 
 print('Calculating differences for all indicators...')
 JER_Scoreboard_b=pd.read_csv(localpath+'JER_scoreboard.csv')
+JER_Scoreboard_b = JER_Scoreboard_b[JER_Scoreboard_b['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
 JER_Scoreboard = pd.DataFrame()
 for indic in set(JER_Scoreboard_b['IND_CODE']):
     year=getField(indic,'lastYear')
@@ -382,6 +394,7 @@ JER_Scoreboard_diff.to_csv(localpath+'JER_scoreboard_diff.csv',index=False, floa
 
 print('Preparing data for output...')
 table = pd.read_csv(localpath+'JER_scoreboard.csv')
+table = table[table['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
 table = table[['IND_CODE','Indicator','type','Order','change','geo','year','value_n','flag','ychange','ychange_flag']]
 
 JER_Scoreboard_agg=pd.read_csv(localpath+'JER_scoreboard_diff.csv')
