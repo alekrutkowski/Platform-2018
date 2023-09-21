@@ -1,32 +1,40 @@
 Sub format_disso1()
 
 Dim WS_Count As Integer
-Dim I As Integer, c As Integer
+Dim i As Integer, c As Integer
 Dim bookmarks As Range
+Dim filepath As String
+
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
+    filepath = Replace(filepath, "dissemination", "output")
+    MsgBox "Opening: " & filepath & "output.xlsx", vbInformation, "Info"
+    Workbooks.Open Filename:=filepath & "output.xlsx"
+
+
 
     Windows("output.xlsx").Activate
     WS_Count = ActiveWorkbook.Worksheets.Count - 1 ' -1 because to avoid touching sheet "Cut_offs II"
 
-    For I = 1 To WS_Count
+    For i = 1 To WS_Count
 
-        Worksheets(I).Select
+        Worksheets(i).Select
 
         ActiveWindow.Zoom = 80
 
         ActiveSheet.Columns("A:A").Delete
         ActiveSheet.Columns("A:A").ColumnWidth = 15
 
-    Next I
+    Next i
 
-    For I = 1 To WS_Count - 1
+    For i = 1 To WS_Count - 1
 
-        Worksheets(I).Activate
+        Worksheets(i).Activate
 
         ActiveSheet.Rows("1:1").Delete
         ActiveSheet.Rows("1:1").RowHeight = 75
         ActiveSheet.Rows("2:2").RowHeight = 30
 
-        If I <> 4 Then
+        If i <> 4 Then
             ActiveSheet.Rows("3:3").Delete
         End If
 
@@ -41,7 +49,7 @@ Dim bookmarks As Range
         End With
 
 
-        If I = 3 Then
+        If i = 3 Then
             ActiveSheet.Range("B3:DD800").Select
 
             With Selection
@@ -50,7 +58,7 @@ Dim bookmarks As Range
             End With
         End If
 
-        If I = 5 Then
+        If i = 5 Then
            ActiveSheet.Range("B3:DD800").NumberFormat = "0.00"
         End If
 
@@ -67,7 +75,7 @@ Dim bookmarks As Range
             .ReadingOrder = xlContext
         End With
 
-    Next I
+    Next i
 
     Sheets("Differences").Activate
     Columns("A:A").Select
@@ -92,7 +100,7 @@ Dim bookmarks As Range
 
     c = 2
 
-    For I = 1 To 16
+    For i = 1 To 16
 
         Cells(2, c).Select
 
@@ -124,7 +132,7 @@ Dim bookmarks As Range
             c = c - 2
         End If
 
-    Next I
+    Next i
 
     Rows("2:2").RowHeight = 22.2
 
@@ -134,94 +142,140 @@ Dim bookmarks As Range
     Worksheets("Cut_offs II").Range("C2:F32").NumberFormat = "0.0"
     Worksheets("Cut_offs II").Columns(1).AutoFit
     Worksheets("Cut_offs II").Columns(2).AutoFit
-
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B24").Value
+    ' Turn off warnings to overwrite the file without prompts
+    Application.DisplayAlerts = False
+    ' Save the active workbook to the specified filepath
+    ActiveWorkbook.SaveAs Filename:=filepath
+    ActiveWorkbook.Close
+    ' Turn warnings back on
+    Application.DisplayAlerts = True
+    MsgBox "Saved transformed output.xlsx as: " & filepath, vbInformation, "Info"
 
 End Sub
 Sub format_disso2()
 
 Dim WS_Count As Integer
-Dim I As Integer
+Dim i As Integer
 Dim ids As Range, cell As Range, indicators As Range
+Dim filepath As String
 
-    Workbooks.Open Filename:= _
-        "U:\04 Data and tools\Reports\scoreboard\Headline indicators table.csv"
-    Set indicators = Range("A1:B16")
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
+    filepath = Replace(filepath, "dissemination", "output")
+    MsgBox "Opening: " & filepath & "COLOURS.xlsx", vbInformation, "Info"
+    Workbooks.Open Filename:=filepath & "COLOURS.xlsx"
 
     Windows("COLOURS.xlsx").Activate
-    WS_Count = ActiveWorkbook.Worksheets.Count
-
-    Worksheets(1).Select
-
-    ActiveWindow.Zoom = 80
-    ActiveSheet.Columns("A:A").Delete
-    ActiveSheet.Columns("A:A").ColumnWidth = 25
-    ActiveSheet.Columns("B:Q").ColumnWidth = 15
-
-    Range("B1:Q1").Select
+    Sheets("All").Select
+    Range("D2:J17").Select
     With Selection
-        .HorizontalAlignment = xlCenter
+        .HorizontalAlignment = xlGeneral
         .VerticalAlignment = xlCenter
         .WrapText = True
-        .Font.Bold = True
+        .Orientation = 0
+        .AddIndent = False
+        .IndentLevel = 0
+        .ShrinkToFit = False
+        .ReadingOrder = xlContext
+        .MergeCells = False
     End With
-
-    Rows("1:1").RowHeight = 102
-    Rows("2:8").EntireRow.AutoFit
-
-    Set ids = Range("B1:Q1")
-
-    For Each cell In ids
-
-        cell.Value = Application.VLookup(cell.Value, indicators, 2, False)
-
-    Next cell
-
+    ' Turn off warnings to overwrite the file without prompts
     Application.DisplayAlerts = False
-    For I = WS_Count To 2 Step -1
-        Worksheets(I).Delete
-    Next I
+    ' Save the active workbook to the specified filepath
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B25").Value
+    ActiveWorkbook.SaveAs Filename:=filepath
+    ActiveWorkbook.Close
+    ' Turn warnings back on
     Application.DisplayAlerts = True
+    MsgBox "Saved COLOURS.xlsx as: " & filepath, vbInformation, "Info"
 
-    Windows("Headline indicators table.csv").Close
+'    Workbooks.Open Filename:= _
+'        "U:\04 Data and tools\Reports\scoreboard\Headline indicators table.csv"
+'    Set indicators = Range("A1:B16")
+'
+'    Windows("COLOURS.xlsx").Activate
+'    WS_Count = ActiveWorkbook.Worksheets.Count
+'
+'    Worksheets(1).Select
+'
+'    ActiveWindow.Zoom = 80
+'    ActiveSheet.Columns("A:A").Delete
+'    ActiveSheet.Columns("A:A").ColumnWidth = 25
+'    ActiveSheet.Columns("B:Q").ColumnWidth = 15
+'
+'    Range("B1:Q1").Select
+'    With Selection
+'        .HorizontalAlignment = xlCenter
+'        .VerticalAlignment = xlCenter
+'        .WrapText = True
+'        .Font.Bold = True
+'    End With
+'
+'    Rows("1:1").RowHeight = 102
+'    Rows("2:8").EntireRow.AutoFit
+'
+'    Set ids = Range("B1:Q1")
+'
+'    For Each cell In ids
+'
+'        cell.Value = Application.VLookup(cell.Value, indicators, 2, False)
+'
+'    Next cell
+'
+'    Application.DisplayAlerts = False
+'    For i = WS_Count To 2 Step -1
+'        Worksheets(i).Delete
+'    Next i
+'    Application.DisplayAlerts = True
+'
+'    Windows("Headline indicators table.csv").Close
 
 End Sub
 Sub format_disso3()
 
 Dim WS_Count As Integer
-Dim I As Integer
+Dim i As Integer
 Dim sh_name As String
 Dim freq As String
 Dim rng As Range
 Dim cell As Range
+Dim filepath As String
 
     'freq = InputBox("Are these quarterly or yearly indicators? Type q for quarterly or y for yearly")
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
+    filepath = Replace(filepath, "dissemination", "output")
+    MsgBox "Opening: " & filepath & "COLOURS.xlsx", vbInformation, "Info"
+    Workbooks.Open Filename:=filepath & "COLOURS.xlsx"
+    MsgBox "Opening: U:\04 Data and tools\Reports\scoreboard\static_scoreboard.xlsx", vbInformation, "Info"
+    Workbooks.Open Filename:="U:\04 Data and tools\Reports\scoreboard\static_scoreboard.xlsx"
+
 
     Windows("static_scoreboard.xlsx").Activate
     'Windows("static_scoreboard_q.xlsx").Activate
     Dim ws As Worksheet
     ' Loop through each worksheet in reverse order
     ' Reverse order is used to avoid skipping sheets when deleting
-    For I = Sheets.Count To 1 Step -1
-        Set ws = Sheets(I)
+    For i = Sheets.Count To 1 Step -1
+        Set ws = Sheets(i)
         ' Check if the name of the worksheet starts with "Sheet"
         If ws.Name Like "Sheet*" Then
             Application.DisplayAlerts = False ' Disable alerts to avoid confirmation dialog
             ws.Delete
             Application.DisplayAlerts = True  ' Enable alerts again
         End If
-    Next I
+    Next i
 
 
     WS_Count = ActiveWorkbook.Worksheets.Count
 
 
-    For I = 1 To WS_Count
+    For i = 1 To WS_Count
 
-        Worksheets(I).Activate
+        Worksheets(i).Activate
         Columns("A:H").Select
         Selection.Insert Shift:=xlToRight, CopyOrigin:=xlFormatFromLeftOrAbove
 
-    Next I
+    Next i
 
     Workbooks.Open Filename:= _
         "U:\04 Data and tools\Reports\scoreboard\Colour template.xlsx"
@@ -232,20 +286,20 @@ Dim cell As Range
     Windows("static_scoreboard.xlsx").Activate
     'Windows("static_scoreboard_q.xlsx").Activate
 
-    For I = 1 To WS_Count
+    For i = 1 To WS_Count
 
-        Worksheets(I).Activate
+        Worksheets(i).Activate
         Range("A1").Select
         ActiveSheet.Paste
 
-    Next I
+    Next i
 
     Application.CutCopyMode = False
 
-    For I = 2 To WS_Count + 1
+    For i = 2 To WS_Count + 1
 
         Windows("COLOURS.xlsx").Activate
-        Worksheets(I).Activate
+        Worksheets(i).Activate
         sh_name = ActiveSheet.Name
         Range("C3:G7").Copy
         Windows("static_scoreboard.xlsx").Activate
@@ -255,22 +309,34 @@ Dim cell As Range
         Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
             :=False, Transpose:=False
 
-    Next I
+    Next i
 
     Application.CutCopyMode = False
 
-    For I = 1 To WS_Count
+    For i = 1 To WS_Count
 
-        Worksheets(I).Activate
+        Worksheets(i).Activate
         Columns("B:G").ColumnWidth = 24
         Set rng = ActiveSheet.Range("C10:G14")
         For Each cell In rng
             cell.EntireRow.AutoFit
         Next cell
 
-    Next I
+    Next i
 
     Workbooks("Colour template.xlsx").Close
+
+    Windows("static_scoreboard.xlsx").Activate
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B26").Value
+    ' Turn off warnings to overwrite the file without prompts
+    Application.DisplayAlerts = False
+    ' Save the active workbook to the specified filepath
+    ActiveWorkbook.SaveAs Filename:=filepath
+    ActiveWorkbook.Close
+    ' Turn warnings back on
+    Application.DisplayAlerts = True
+    Workbooks("COLOURS.xlsx").Close
+    MsgBox "Saved transformed static_scoreboard.xlsx as: " & filepath, vbInformation, "Info"
 
 End Sub
 
@@ -279,11 +345,19 @@ Sub format_disso4()
 
 Dim data As Range
 Dim col_count As Integer
-Dim I As Integer
+Dim i As Integer
 Dim WS_Count As Integer
 Dim MS As String
 Dim r As Integer
 Dim currentDate As String
+Dim filepath As String
+
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
+    filepath = Replace(filepath, "dissemination", "output")
+    MsgBox "Opening: " & filepath & "SCATTER.csv", vbInformation, "Info"
+    Workbooks.Open Filename:=filepath & "SCATTER.csv"
+    MsgBox "Opening: U:\04 Data and tools\Reports\scoreboard\Template.xlsx", vbInformation, "Info"
+    Workbooks.Open Filename:="U:\04 Data and tools\Reports\scoreboard\Template.xlsx"
 
     currentDate = Format(Date, "dd mmmm yyyy")
 
@@ -296,11 +370,11 @@ Dim currentDate As String
 
     Range("B1").Value = "ind_num"
 
-    For I = 1 + 1 To col_count
+    For i = 1 + 1 To col_count
 
-        Cells(I, 2).Value = Mid(Cells(I, 1), 3, 3)
+        Cells(i, 2).Value = Mid(Cells(i, 1), 3, 3)
 
-    Next I
+    Next i
 
     Range("A1").CurrentRegion.Name = "data"
 
@@ -309,9 +383,9 @@ Dim currentDate As String
     Windows("Template.xlsx").Activate
     WS_Count = ActiveWorkbook.Worksheets.Count
 
-    For I = 1 To WS_Count
+    For i = 1 To WS_Count
 
-        Worksheets(I).Select
+        Worksheets(i).Select
         MS = ActiveSheet.Name
 
         Windows("SCATTER.csv").Activate
@@ -349,15 +423,54 @@ Dim currentDate As String
         Range("I1:I17").Borders(xlEdgeRight).LineStyle = xlContinuous
         Range("I1:I17").Borders(xlEdgeRight).Weight = xlThin
 
-    Next I
+    Next i
 
     Windows("SCATTER.csv").Activate
     DeleteColumnByTitle ("ind_num") ' clean-up
     Windows("Template.xlsx").Activate
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B27").Value
+    ' Turn off warnings to overwrite the file without prompts
+    Application.DisplayAlerts = False
+    ' Save the active workbook to the specified filepath
+    ActiveWorkbook.SaveAs Filename:=filepath
+    ActiveWorkbook.Close
+    Workbooks("SCATTER.csv").Close
+    ' Turn warnings back on
+    Application.DisplayAlerts = True
+    MsgBox "Saved transformed Template.xlsx as: " & filepath, vbInformation, "Info"
 
 End Sub
 
-' Option Explicit
+Sub format_disso5()
+Dim filepath As String
+
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
+    filepath = Replace(filepath, "dissemination", "output")
+    MsgBox "Opening: " & filepath & "For_SCF_tables_Input_Data_worksheet.csv", vbInformation, "Info"
+    Workbooks.Open Filename:=filepath & "For_SCF_tables_Input_Data_worksheet.csv"
+    MsgBox "Opening: U:\04 Data and tools\Reports\scoreboard\JER SCF Tables.xlsx", vbInformation, "Info"
+    Workbooks.Open Filename:="U:\04 Data and tools\Reports\scoreboard\JER SCF Tables.xlsx"
+
+    Windows("For_SCF_tables_Input_Data_worksheet.csv").Activate
+    Range("A1").Select
+    Range(Selection, Selection.End(xlDown)).Select
+    Range(Selection, Selection.End(xlToRight)).Select
+    Selection.Copy
+    Windows("JER SCF Tables.xlsx").Activate
+    Sheets("NEW For_SCF_tables_Input_Data_w").Select
+    ActiveSheet.Paste
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B28").Value
+    ' Turn off warnings to overwrite the file without prompts
+    Application.DisplayAlerts = False
+    ' Save the active workbook to the specified filepath
+    ActiveWorkbook.SaveAs Filename:=filepath
+    ActiveWorkbook.Close
+    ' Turn warnings back on
+    Application.DisplayAlerts = True
+    Workbooks("For_SCF_tables_Input_Data_worksheet.csv").Close
+    MsgBox "Saved updated `JER SCF Tables.xlsx` as: " & filepath, vbInformation, "Info"
+
+End Sub
 
 Sub fillpattern()
 '
@@ -413,6 +526,36 @@ Sub DeleteColumnByTitle(colTitle As String)
         End If
     Next col
 End Sub
+
+Sub SaveCellsToTextFile()
+    Dim fso As Object
+    Dim txtFile As Object
+    Dim cellContent As String
+    Dim filepath As String
+    Dim i As Integer
+
+    ' Create a File System Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+
+    ' Define the path of the text file
+    filepath = Environ("USERPROFILE") & "\File names to be used.txt"
+
+    ' Create a text file (if it doesn't exist, it will be created; if it exists, it will be overwritten)
+    Set txtFile = fso.CreateTextFile(filepath, True)
+
+    ' Loop through cells A1 to A4 to read their content and write to the text file
+    For i = 24 To 27
+        cellContent = Worksheets("Sheet1").Range("B" & i).Value
+        txtFile.WriteLine (cellContent)
+    Next i
+
+    ' Close the text file
+    txtFile.Close
+
+    ' Open the text file in Notepad
+    Shell "notepad.exe " & filepath, vbNormalFocus
+End Sub
+
 
 Sub testing()
         ' Placeholder macro for testing new code snippets

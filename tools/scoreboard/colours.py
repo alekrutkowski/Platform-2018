@@ -268,7 +268,8 @@ indics_years = pd.read_csv(localpath+"SCORES.csv",
                            usecols=["code", "year"]).drop_duplicates()
 indics_years['code'] = pd.Categorical(indics_years['code'],
                                       categories=list(correspondence_dict.keys()), ordered=True)
-indics_years = indics_years.sort_values(by='code')
+indics_years['numeric_code'] = indics_years['code'].str.lstrip('ID').astype(int)
+indics_years = indics_years.sort_values(by='numeric_code').drop(columns='numeric_code')
 new_sheet.insert_cols(idx=3)
 for index, value in enumerate(indics_years['year'], start=2):
     new_sheet.cell(row=index, column=3).value = value
