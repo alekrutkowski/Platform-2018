@@ -46,7 +46,9 @@ def download_and_stack(listFiles):
     message=""
     for file in listFiles:
         #if 1==1:
-        if os.path.isfile(stacked_path+file+'.csv')==False or (time.time()-os.path.getmtime(csv_path+file+'.csv'))>(daysToNotDownload*86400):            
+        if ((open('U:/04 Data and tools/Reports/scoreboard/DO_NOT_DOWNLOAD_DATA_FLAG.txt').read().strip().lower()!='true') and
+                (os.path.isfile(stacked_path+file+'.csv')==False or
+                (time.time()-os.path.getmtime(csv_path+file+'.csv'))>(daysToNotDownload*86400) )):
             try:
                 message+=download_files_eurostat(file)            
                 stack_any_file(file)

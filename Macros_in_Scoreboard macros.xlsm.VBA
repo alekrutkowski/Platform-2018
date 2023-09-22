@@ -324,7 +324,7 @@ Dim filepath As String
 
     Next i
 
-    Workbooks("Colour template.xlsx").Close
+    Workbooks("Colour template.xlsx").Close SaveChanges:=False
 
     Windows("static_scoreboard.xlsx").Activate
     filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B26").Value
@@ -335,7 +335,7 @@ Dim filepath As String
     ActiveWorkbook.Close
     ' Turn warnings back on
     Application.DisplayAlerts = True
-    Workbooks("COLOURS.xlsx").Close
+    Workbooks("COLOURS.xlsx").Close SaveChanges:=False
     MsgBox "Saved transformed static_scoreboard.xlsx as: " & filepath, vbInformation, "Info"
 
 End Sub
@@ -434,7 +434,7 @@ Dim filepath As String
     ' Save the active workbook to the specified filepath
     ActiveWorkbook.SaveAs Filename:=filepath
     ActiveWorkbook.Close
-    Workbooks("SCATTER.csv").Close
+    Workbooks("SCATTER.csv").Close SaveChanges:=False
     ' Turn warnings back on
     Application.DisplayAlerts = True
     MsgBox "Saved transformed Template.xlsx as: " & filepath, vbInformation, "Info"
@@ -467,7 +467,7 @@ Dim filepath As String
     ActiveWorkbook.Close
     ' Turn warnings back on
     Application.DisplayAlerts = True
-    Workbooks("For_SCF_tables_Input_Data_worksheet.csv").Close
+    Workbooks("For_SCF_tables_Input_Data_worksheet.csv").Close SaveChanges:=False
     MsgBox "Saved updated `JER SCF Tables.xlsx` as: " & filepath, vbInformation, "Info"
 
 End Sub

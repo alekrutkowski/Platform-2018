@@ -1,12 +1,11 @@
 Sub extract_scatter_chart()
 Dim filepath As String
 
-    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
-    filepath = Replace(filepath, "dissemination", "output")
-    MsgBox "Opening: " & filepath & "SCATTER.csv", vbInformation, "Info"
-    Workbooks.Open Filename:=filepath & "SCATTER.csv"
     MsgBox "Opening: U:\04 Data and tools\Reports\scoreboard\Pivot_for_Scatters.xlsm", vbInformation, "Info"
     Workbooks.Open Filename:="U:\04 Data and tools\Reports\scoreboard\Pivot_for_Scatters.xlsm"
+    Workbooks("Pivot_for_Scatters.xlsm").Activate
+    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
+    filepath = Replace(filepath, "dissemination", "output")
     Dim response As VbMsgBoxResult
     response = MsgBox("Have you updated the path of the 'Text SCATTER' data source in PowerPivot in Pivot_for_Scatters.xlsm?" & vbNewLine & _
                   "The new path should be:" & vbNewLine & filepath & "SCATTER.csv" & vbNewLine & vbNewLine & _
@@ -20,17 +19,25 @@ Dim filepath As String
         Exit Sub
     End If
 
-    Workbooks("Pivot_for_Scatters.xlsm").Activate
     Worksheets("scatter").Activate
-    Dim indicators As Variant
-    indicators = Range("G3:G18")
+'Dim indicators As Variant
+'Dim j As Long
+'Dim oneDArray() As Variant
+'' Convert the range to a 2D array
+'indicators = Range("G3:G18").Value
+'' Resize the 1D array to hold the values
+'ReDim oneDArray(1 To UBound(indicators, 1))
+'' Transfer values from 2D array to 1D array
+'For j = 1 To UBound(indicators, 1)
+'    oneDArray(j) = indicators(j, 1)
+'Next j
 
     'Dim indic As Range
      '   For Each indic In indicators
       '         Debug.Print indic.Value
        ' Next indic
 
-    'indicators = Array("ID1", "ID4", "ID7", "ID17", "ID20", "ID22", "ID31", "ID50", "ID61", "ID66", "ID83", "ID99", "ID106", "ID109", "ID113", "ID114")
+    indicators = Array("ID1", "ID4", "ID7", "ID17", "ID20", "ID22", "ID31", "ID50", "ID61", "ID66", "ID83", "ID99", "ID106", "ID109", "ID113", "ID114")
     Application.DisplayAlerts = False
     DataSourceName = "SCATTER"
     Set originalWB = ActiveWorkbook
@@ -41,7 +48,7 @@ Dim filepath As String
     Workbooks.Open Filename:=ThisWorkbook.Path & "\static_scoreboard.xlsx"
     Set finalWB = ActiveWorkbook
 
-    For i = 0 To UBound(indicators)
+    For i = LBound(indicators) To UBound(indicators)
     'For i = 4 To 6
         originalWB.Activate
         Sheets(actSh).Select
@@ -85,4 +92,9 @@ Dim filepath As String
     finalWB.Save
     'finalWB.Close
 
+    Workbooks("Pivot_for_Scatters.xlsm").Close SaveChanges:=True
+
+    MsgBox "extract_scatter_chart macro finished. Now run 'Format Dissemination 3' macro"
+
 End Sub
+
