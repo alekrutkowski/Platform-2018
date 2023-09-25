@@ -327,6 +327,12 @@ Dim filepath As String
     Workbooks("Colour template.xlsx").Close SaveChanges:=False
 
     Windows("static_scoreboard.xlsx").Activate
+    Sheets("ID22").Select
+    ActiveSheet.ChartObjects("Chart 1").Activate
+    ActiveChart.Axes(xlCategory).MinimumScale = 60
+    ActiveSheet.ChartObjects("Chart 2").Activate
+    ActiveChart.Axes(xlCategory).MinimumScale = 60
+    Sheets("ID1").Select
     filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B26").Value
     ' Turn off warnings to overwrite the file without prompts
     Application.DisplayAlerts = False
