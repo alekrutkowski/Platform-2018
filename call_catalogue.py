@@ -162,7 +162,7 @@ def quarterly():
 
 #a=quick_excel(['PL'], 'PL_ad_hoc.csv','PL_ad_hoc')
 quarterly()
-#quarterlyannex=anyCatalogue('Quarterly Annex - catalogue.csv', 'quarterly_annex_data', FX_FR=True)
+quarterlyannex=anyCatalogue('Quarterly Annex - catalogue.csv', 'quarterly_annex_data', FX_FR=True)
 #data=EuropeanSemester()
 #enlargement_yearly()
 #esde=anyCatalogue('ESDE annex - catalogue.csv', 'esde_annex', FX_FR=True)

@@ -192,7 +192,7 @@ def GDHI_EUR_per_capita():
         per_capita.to_csv(calculated_path+'real_GDHI_'+my_time+'_per_capita_EUR.csv',index=False, float_format='%.3f')
 
 yearlyGDHI()
-# quarterlyGDHI()
+quarterlyGDHI()
 GDHI_EUR_per_capita()
 
 #TO DO: PRODUCE QUARTERLY GDHI SCA

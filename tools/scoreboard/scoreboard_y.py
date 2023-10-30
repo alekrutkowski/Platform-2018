@@ -120,7 +120,7 @@ def setLastYear(dataset):
         elif(indic == 'ID60'):
             year=2020
         elif(indic == 'ID61'):
-            year=2021
+            year=2022
         elif(indic == 'ID118'):
             year=2022
         else:
