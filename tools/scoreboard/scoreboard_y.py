@@ -1,3 +1,117 @@
+import os
+
+# Define the file path
+file_path = r'H:\Data\Participation in education and training (excluding guided on the job training).xlsx'
+# Check if the file exists
+if not os.path.exists(file_path):
+    raise FileNotFoundError("The file is not present in the specified directory:\n" + file_path +
+                            "\nYou can download it from:\n" +
+                            "https://circabc.europa.eu/ui/group/d14c857a-601d-438a-b878-4b4cebd0e10f/library/c5a8b987-1e37-44d7-a20e-2c50d6101d27/details" +
+                            "\nor get from Elodie CAYOTTE (ESTAT) <Elodie.CAYOTTE@ec.europa.eu> or Sabine GAGEL (ESTAT) <Sabine.GAGEL@ec.europa.eu>"
+                            )
+
+import pandas as pd
+
+# Import rows 5 to 33 from the sheet named "TIME"
+# Note: Python uses 0-based indexing, Excel uses 1-based indexing
+# skiprows=4 skips the first 4 rows, and nrows=28 reads the next 29 rows (column header + 28 data rows)
+Participation_in_education_and_training = \
+    pd.read_excel(file_path, sheet_name='TIME', skiprows=4, nrows=28, engine='openpyxl')
+# Iterate through the columns and rename "Unnamed" columns
+new_columns = {}
+prev_column = None
+for column in Participation_in_education_and_training.columns:
+    if "Unnamed" in str(column):
+        new_columns[column] = f'flag_{prev_column}'
+    else:
+        prev_column = column
+# Rename the columns in the DataFrame
+Participation_in_education_and_training.rename(columns=new_columns, inplace=True)
+Participation_in_education_and_training = \
+    Participation_in_education_and_training[
+        [Participation_in_education_and_training.columns[0]] + # country name
+        [column for column in
+         Participation_in_education_and_training.columns if str(column).endswith('.1')]
+    ]
+Participation_in_education_and_training.rename(
+    columns={Participation_in_education_and_training.columns[0]: 'geo'}, inplace=True)
+Eurostat_country_codes = {
+    "EU-27": "EU27_2020",
+    "Belgium": "BE",
+    "Bulgaria": "BG",
+    "Czechia": "CZ",
+    "Denmark": "DK",
+    "Germany": "DE",
+    "Estonia": "EE",
+    "Ireland": "IE",
+    "Greece": "EL",  # Note: Eurostat uses EL for Greece, not GR
+    "Spain": "ES",
+    "France": "FR",
+    "Croatia": "HR",
+    "Italy": "IT",
+    "Cyprus": "CY",
+    "Latvia": "LV",
+    "Lithuania": "LT",
+    "Luxembourg": "LU",
+    "Hungary": "HU",
+    "Malta": "MT",
+    "Netherlands": "NL",
+    "Austria": "AT",
+    "Poland": "PL",
+    "Portugal": "PT",
+    "Romania": "RO",
+    "Slovenia": "SI",
+    "Slovakia": "SK",
+    "Finland": "FI",
+    "Sweden": "SE",
+}
+# Replace the country names in the "geo" column with their Eurostat codes
+Participation_in_education_and_training['geo'] = \
+    Participation_in_education_and_training['geo'].apply(lambda x: Eurostat_country_codes.get(x, x))
+# Remove the ".1" suffix from the column names
+Participation_in_education_and_training.columns = \
+    Participation_in_education_and_training.columns.map(lambda x: x[:-2] if x.endswith('.1') else x)
+## Reshape to long format
+# Step 1: Separate data and flag columns
+data_columns = [col for col in Participation_in_education_and_training.columns if not col.startswith('flag')]
+flag_columns = [col for col in Participation_in_education_and_training.columns if col.startswith('flag')]
+# Step 2: Melt data columns
+df_data_melted = pd.melt(Participation_in_education_and_training,
+                         id_vars='geo', value_vars=data_columns[1:], var_name='year', value_name='value_n')
+df_data_melted['year'] = df_data_melted['year'].str.replace('.1', '')  # Clean up the year column
+# Step 3: Melt flag columns
+# Adjust flag column names to match year format for easier merge
+df_flags = Participation_in_education_and_training[
+    ['geo'] +
+    flag_columns].rename(columns=lambda x: x.replace('flag_', '').replace('.1', ''))
+df_flags_melted = pd.melt(df_flags, id_vars='geo', var_name='year', value_name='flag')
+# Step 4: Merge data and flag DataFrames
+Participation_in_education_and_training = pd.merge(df_data_melted, df_flags_melted, on=['geo', 'year'], how='left')
+# Convert 'year' column to integers
+Participation_in_education_and_training['year'] = \
+    Participation_in_education_and_training['year'].astype(int)
+# Convert 'value_n' column to floats
+Participation_in_education_and_training['value_n'] = \
+    pd.to_numeric(Participation_in_education_and_training['value_n'], errors='coerce')
+Participation_in_education_and_training['file'] = 'Participation_in_education_and_training'
+Participation_in_education_and_training = \
+    Participation_in_education_and_training[['year', 'geo', 'file', 'value_n', 'flag']]
+Participation_in_education_and_training = \
+    Participation_in_education_and_training[
+        Participation_in_education_and_training['year'].
+            isin(sorted(Participation_in_education_and_training['year'].
+                        unique())[-2:]) # Keep only the last two years
+    ]
+## Artificially make the second-latest-available year = latest-available-year minus 3 to fit the subsequent scoreboard methodology => to be then correctrd in the Excel output
+latest_year = Participation_in_education_and_training['year'].max()
+second_latest_year = sorted(Participation_in_education_and_training['year'].unique())[-2]
+# Update the DataFrame: change the second-latest year to target year
+Participation_in_education_and_training['year'] = \
+    Participation_in_education_and_training['year'].replace(second_latest_year, latest_year - 3)
+# Write the DataFrame to a CSV file
+Participation_in_education_and_training.to_csv(
+    r'H:\Data\non_standard\calculated\Participation_in_education_and_training.csv', index=False)
+
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jun 26 17:14:37 2017
@@ -62,7 +176,7 @@ def getCategories(x):
     myChange = x['score_ychange']
     if myLevel < -1 and myChange < 1:
         return 1 #'r'
-    elif (-1 <= myLevel < -0.5) or (myLevel < -1 and 1 <= myChange) or ( -0.5 <= myLevel < 0.5 and  myChange <-1):
+    elif (-1 <= myLevel < -0.5) or (myLevel < -1 and 1 <= myChange) or ( -0.5 <= myLevel < 0.5 and  myChange < -1):
         return 2 #'orange'
     elif  -0.5 <= myLevel < 0.5 and -1 <= myChange < 1 :
         return 3 #'lightgray'
@@ -256,11 +370,11 @@ scores.to_csv(localpath+'SCORES_all_years.csv')   # Scores saved: headline indic
 scores= JER_Scores
 # Prepare the dataframe for saving
 scores.columns=['code','indicator','type','Order','lastYear','sense','change','group','geo','year','level','flag','scoreL','ydiff','ydiff_flag','scoreD','category','LabelL','LabelD']
-scores = scores[scores['code']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
-scores.loc[(scores['code']=='ID4') & (scores['year']==2021),
-           'scoreD'] = 0  # EXCEPTIONAL - TEMPORARY !!! ★
-scores.loc[(scores['code']=='ID4') & (scores['year']==2021),
-           'LabelD'] = 'On average'  # EXCEPTIONAL - TEMPORARY !!! ★
+# scores = scores[scores['code']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
+# scores.loc[(scores['code']=='ID4') & (scores['year']==2021),
+#            'scoreD'] = 0  # EXCEPTIONAL - TEMPORARY !!! ★
+# scores.loc[(scores['code']=='ID4') & (scores['year']==2021),
+#            'LabelD'] = 'On average'  # EXCEPTIONAL - TEMPORARY !!! ★
 # Save the scores
 scores.to_csv(localpath+'SCORES.csv')   # Scores saved: headline indicators, all countries, last year only
 
@@ -282,7 +396,7 @@ writer.close() # https://stackoverflow.com/a/76119258
 
 JER_Scoreboard_b=pd.read_csv(localpath+extractionFile)
 JER_Scoreboard_b = JER_Scoreboard_b[['IND_CODE','Indicator','type','Order','change','geo','year','value_n','flag']]
-JER_Scoreboard_b = JER_Scoreboard_b[JER_Scoreboard_b['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
+# JER_Scoreboard_b = JER_Scoreboard_b[JER_Scoreboard_b['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
 
 # Calculate annual changes
 for i in range(1):
@@ -336,7 +450,7 @@ ranking = pd.read_csv(localpath+'Countries_ranking.csv')
 
 print('Calculating differences for all indicators...')
 JER_Scoreboard_b=pd.read_csv(localpath+'JER_scoreboard.csv')
-JER_Scoreboard_b = JER_Scoreboard_b[JER_Scoreboard_b['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
+# JER_Scoreboard_b = JER_Scoreboard_b[JER_Scoreboard_b['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
 JER_Scoreboard = pd.DataFrame()
 for indic in set(JER_Scoreboard_b['IND_CODE']):
     year=getField(indic,'lastYear')
@@ -394,7 +508,7 @@ JER_Scoreboard_diff.to_csv(localpath+'JER_scoreboard_diff.csv',index=False, floa
 
 print('Preparing data for output...')
 table = pd.read_csv(localpath+'JER_scoreboard.csv')
-table = table[table['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
+# table = table[table['IND_CODE']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
 table = table[['IND_CODE','Indicator','type','Order','change','geo','year','value_n','flag','ychange','ychange_flag']]
 
 JER_Scoreboard_agg=pd.read_csv(localpath+'JER_scoreboard_diff.csv')
