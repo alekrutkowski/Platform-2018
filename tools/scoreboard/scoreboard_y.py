@@ -107,7 +107,7 @@ latest_year = Participation_in_education_and_training['year'].max()
 second_latest_year = sorted(Participation_in_education_and_training['year'].unique())[-2]
 # Update the DataFrame: change the second-latest year to target year
 Participation_in_education_and_training['year'] = \
-    Participation_in_education_and_training['year'].replace(second_latest_year, latest_year - 3)
+    Participation_in_education_and_training['year'].replace(second_latest_year, latest_year - 1)
 # Write the DataFrame to a CSV file
 Participation_in_education_and_training.to_csv(
     r'H:\Data\non_standard\calculated\Participation_in_education_and_training.csv', index=False)

@@ -139,6 +139,7 @@ Dim filepath As String
     Workbooks("bookmarks.csv").Close
 
     Windows("output.xlsx").Activate
+    special_adjustments_to_file1 ' <---- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Worksheets("Cut_offs II").Range("C2:F32").NumberFormat = "0.0"
     Worksheets("Cut_offs II").Columns(1).AutoFit
     Worksheets("Cut_offs II").Columns(2).AutoFit
@@ -153,6 +154,34 @@ Dim filepath As String
     MsgBox "Saved transformed output.xlsx as: " & filepath, vbInformation, "Info"
 
 End Sub
+
+Sub special_adjustments_to_file1()
+    Worksheets("Headline").Range("B2:H2").UnMerge
+    Application.DisplayAlerts = False ' Suppress warnings for merge
+        Dim ranges As Variant
+        ranges = Array("B2:C2", "D2:F2", "G2:H2") ' Define the ranges to which you want to apply merge and borders
+        Dim i As Integer
+        For i = LBound(ranges) To UBound(ranges)
+            Worksheets("Headline").Range(ranges(i)).Merge
+            With Worksheets("Headline").Range(ranges(i)).Borders
+                .LineStyle = xlContinuous
+                .Color = vbBlack
+                .Weight = xlThin
+            End With
+        Next i
+    Application.DisplayAlerts = False ' Unsuppress warnings for merge
+    With Worksheets("Headline")
+        .Range("B3").Value = 2016
+        .Range("B2").Value = "https://circabc.europa.eu/ui/group/d14c857a-601d-438a-b878-4b4cebd0e10f/library/c5a8b987-1e37-44d7-a20e-2c50d6101d27/details"
+        .Range("D2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/e48bf39d-5176-410d-b32f-f4a5d22fbfdd?lang=en"
+        .Range("G2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/40ecd88d-1514-4d6b-8260-3c4f5b8f4d0a?lang=en"
+    End With
+    Worksheets("Flags").Range("B2").Value = 2016
+    Worksheets("Headline_flags").Range("B2").Value = 2016
+
+End Sub
+
+
 Sub format_disso2()
 
 Dim WS_Count As Integer
