@@ -158,17 +158,14 @@ End Sub
 Sub special_adjustments_to_file1()
     Worksheets("Headline").Range("B2:H2").UnMerge
     Application.DisplayAlerts = False ' Suppress warnings for merge
-        Dim ranges As Variant
-        ranges = Array("B2:C2", "D2:F2", "G2:H2") ' Define the ranges to which you want to apply merge and borders
-        Dim i As Integer
-        For i = LBound(ranges) To UBound(ranges)
-            Worksheets("Headline").Range(ranges(i)).Merge
-            With Worksheets("Headline").Range(ranges(i)).Borders
+        For Each addr In Array("B2:C2", "D2:F2", "G2:H2") ' the ranges to which you want to apply merge and borders
+            Worksheets("Headline").Range(addr).Merge
+            With Worksheets("Headline").Range(addr).Borders
                 .LineStyle = xlContinuous
                 .Color = vbBlack
                 .Weight = xlThin
             End With
-        Next i
+        Next addr
     Application.DisplayAlerts = False ' Unsuppress warnings for merge
     With Worksheets("Headline")
         .Range("B3").Value = 2016
