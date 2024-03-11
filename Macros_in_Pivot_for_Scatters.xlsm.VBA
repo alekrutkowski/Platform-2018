@@ -37,7 +37,7 @@ Dim filepath As String
       '         Debug.Print indic.Value
        ' Next indic
 
-    indicators = Array("ID1", "ID4", "ID7", "ID17", "ID20", "ID22", "ID31", "ID50", "ID61", "ID66", "ID83", "ID99", "ID106", "ID109", "ID113", "ID114")
+    indicators = Array("ID0", "ID1", "ID4", "ID7", "ID17", "ID20", "ID22", "ID31", "ID50", "ID61", "ID66", "ID83", "ID99", "ID106", "ID109", "ID113", "ID114")
     Application.DisplayAlerts = False
     DataSourceName = "SCATTER"
     Set originalWB = ActiveWorkbook

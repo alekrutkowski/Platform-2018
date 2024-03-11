@@ -193,7 +193,7 @@ Dim filepath As String
 
     Windows("COLOURS.xlsx").Activate
     Sheets("All").Select
-    Range("D2:J17").Select
+    Range("D2:J18").Select
     With Selection
         .HorizontalAlignment = xlGeneral
         .VerticalAlignment = xlCenter

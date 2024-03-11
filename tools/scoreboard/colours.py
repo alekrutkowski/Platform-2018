@@ -175,7 +175,7 @@ for myIndicator in set(data['ind']):
 workbook.close()
 
 ##############################################################################################
-# Added in August 2023 by Alek -- replaces macro "format_diss02" from "Scoreboard macros.xlsm"
+# Added in August 2023 by Alek -- replaces old parts of macro "format_diss02" from "Scoreboard macros.xlsm"
 
 import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Protection, Side
@@ -226,9 +226,9 @@ for row in range(1, current_sheet.max_row + 1):
 
 # Sort by IDs
 new_sheet.delete_rows(1) # Empty
-new_sheet.cell(1, 1).value ='ID0' # needed for sorting
+new_sheet.cell(1, 1).value ='ID-100' # needed for sorting
 all_rows = [row for row in new_sheet.iter_rows(values_only=True)]
-sorted_rows = sorted(all_rows, key=lambda row: int(row[0][2:]))
+#sorted_rows = sorted(all_rows, key=lambda row: int(row[0][2:]))
 all_rows_sorted = sorted(all_rows, key=lambda row: int(row[0][2:]))
 for row in new_sheet.iter_rows(): # clean-up
     for cell in row:
@@ -240,7 +240,7 @@ for row_index, row_items in enumerate(all_rows_sorted, 1):  # 1-based indexing f
 # Replace ID codes with indicator names
 correspondence_dict = pd.read_csv(localpath+"SCORES.csv",
                                   usecols=["code","indicator"]).drop_duplicates().set_index('code')['indicator'].to_dict()
-correspondence_dict['ID0'] = ""
+correspondence_dict['ID-100'] = ""
 for row in new_sheet.iter_rows(min_col=1, max_col=1, values_only=False):  # Ensure values_only = False
     cell = row[0]
     if cell.value in correspondence_dict:
@@ -253,15 +253,15 @@ thin_border = Border(left=Side(style='thin'),
                      right=Side(style='thin'),
                      top=Side(style='thin'),
                      bottom=Side(style='thin'))
-new_sheet.merge_cells('A2:A6')
+new_sheet.merge_cells('A2:A7')
 new_sheet['A2'].value = "Equal opportunities"
 new_sheet['A2'].fill = beige_fill
-new_sheet.merge_cells('A7:A10')
-new_sheet['A7'].value = "Fair working conditions"
-new_sheet['A7'].fill = beige_fill
-new_sheet.merge_cells('A11:A17')
-new_sheet['A11'].value = "Social protection and inclusion"
-new_sheet['A11'].fill = beige_fill
+new_sheet.merge_cells('A8:A11')
+new_sheet['A8'].value = "Fair working conditions"
+new_sheet['A8'].fill = beige_fill
+new_sheet.merge_cells('A12:A18')
+new_sheet['A12'].value = "Social protection and inclusion"
+new_sheet['A12'].fill = beige_fill
 
 # Add the column with years
 indics_years = pd.read_csv(localpath+"SCORES.csv",
