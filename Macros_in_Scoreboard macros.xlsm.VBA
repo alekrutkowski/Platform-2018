@@ -158,7 +158,7 @@ End Sub
 Sub special_adjustments_to_file1()
     Worksheets("Headline").Range("B2:H2").UnMerge
     Application.DisplayAlerts = False ' Suppress warnings for merge
-        For Each addr In Array("B2:C2", "D2:F2", "G2:H2") ' the ranges to which you want to apply merge and borders
+        For Each addr In Array("B2:C2", "D2:F2", "G2:H2", "AS2:AU2") ' the ranges to which you want to apply merge and borders
             Worksheets("Headline").Range(addr).Merge
             With Worksheets("Headline").Range(addr).Borders
                 .LineStyle = xlContinuous
@@ -172,6 +172,8 @@ Sub special_adjustments_to_file1()
         .Range("B2").Value = "https://circabc.europa.eu/ui/group/d14c857a-601d-438a-b878-4b4cebd0e10f/library/c5a8b987-1e37-44d7-a20e-2c50d6101d27/details"
         .Range("D2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/e48bf39d-5176-410d-b32f-f4a5d22fbfdd?lang=en"
         .Range("G2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/40ecd88d-1514-4d6b-8260-3c4f5b8f4d0a?lang=en"
+        .Range("AS2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/4e3066d7-ad6b-4f3f-be92-99e33f4b5278?lang=en"
+        .Range("A1").Select
     End With
     Worksheets("Flags").Range("B2").Value = 2016
     Worksheets("Headline_flags").Range("B2").Value = 2016
@@ -425,13 +427,13 @@ Dim filepath As String
         ActiveCell.Offset(0, 9).Select
         r = ActiveCell.Row
 
-        Range("M2:M17").Offset(r - 2, 0).Replace "", "N/A", xlWhole
-        Range("M2:M17").Offset(r - 2, 0).Copy Workbooks("Template.xlsx").Worksheets(MS).Range("R2:R17")
-        Range("F2:F17").Offset(r - 2, 0).Copy Workbooks("Template.xlsx").Worksheets(MS).Range("I2:I17")
+        Range("M2:M18").Offset(r - 2, 0).Replace "", "N/A", xlWhole
+        Range("M2:M18").Offset(r - 2, 0).Copy Workbooks("Template.xlsx").Worksheets(MS).Range("R2:R18")
+        Range("F2:F18").Offset(r - 2, 0).Copy Workbooks("Template.xlsx").Worksheets(MS).Range("I2:I18")
 
         Windows("Template.xlsx").Activate
 
-        For Each c In Range("C2:C17")
+        For Each c In Range("C2:C18")
 
             c.Interior.Color = c.DisplayFormat.Interior.Color
             c.Font.Color = c.DisplayFormat.Font.Color
@@ -439,7 +441,7 @@ Dim filepath As String
 
         Next c
 
-        For Each c In Range("I2:I17")
+        For Each c In Range("I2:I18")
 
             c.Interior.Color = c.DisplayFormat.Interior.Color
             c.Font.Color = c.DisplayFormat.Font.Color
@@ -447,13 +449,13 @@ Dim filepath As String
 
         Next c
 
-        Range("C2:I17").FormatConditions.Delete
-        Range("R2:R17").Delete
-        Range("A19").Value = Replace(Range("A19").Value, "DD MMMM YYYY", currentDate)
-        Range("I2:I17").Borders(xlInsideHorizontal).LineStyle = xlContinuous
-        Range("I2:I17").Borders(xlInsideHorizontal).Weight = xlThin
-        Range("I1:I17").Borders(xlEdgeRight).LineStyle = xlContinuous
-        Range("I1:I17").Borders(xlEdgeRight).Weight = xlThin
+        Range("C2:I18").FormatConditions.Delete
+        Range("R2:R18").Delete
+        Range("A20").Value = Replace(Range("A20").Value, "DD MMMM YYYY", currentDate)
+        Range("I2:I18").Borders(xlInsideHorizontal).LineStyle = xlContinuous
+        Range("I2:I18").Borders(xlInsideHorizontal).Weight = xlThin
+        Range("I1:I18").Borders(xlEdgeRight).LineStyle = xlContinuous
+        Range("I1:I18").Borders(xlEdgeRight).Weight = xlThin
 
     Next i
 
@@ -491,6 +493,7 @@ Dim filepath As String
     Windows("JER SCF Tables.xlsx").Activate
     Sheets("NEW For_SCF_tables_Input_Data_w").Select
     ActiveSheet.Paste
+    Worksheets("MS Tables").Activate
     filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B28").Value
     ' Turn off warnings to overwrite the file without prompts
     Application.DisplayAlerts = False

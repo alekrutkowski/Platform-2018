@@ -92,9 +92,9 @@ Dim filepath As String
     finalWB.Save
     'finalWB.Close
 
-    Workbooks("Pivot_for_Scatters.xlsm").Close SaveChanges:=True
-
     MsgBox "extract_scatter_chart macro finished. Now run 'Format Dissemination 3' macro"
+
+    Workbooks("Pivot_for_Scatters.xlsm").Close SaveChanges:=True
 
 End Sub
 

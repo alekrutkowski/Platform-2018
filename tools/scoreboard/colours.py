@@ -79,6 +79,9 @@ data_for_SCF=pd.read_csv(localpath+"SCORES_all_years.csv")
 data_for_SCF['colour']=data_for_SCF.apply(getColorGroup, axis=1)
 data_for_SCF['colour1']=data_for_SCF.apply(getException, axis=1)
 data_for_SCF['ind'] = 'ID'+data_for_SCF.Order.astype(str)
+max_year_per_ind = data_for_SCF.groupby('ind')['year'].transform(max)
+data_for_SCF = data_for_SCF[~((data_for_SCF['ind'] == 'ID0') & # drop the fake year -- see comment "Artificially make the second-latest-available year..." in scoreboard_y.py
+                              (data_for_SCF['year'] != data_for_SCF[data_for_SCF['ind']=='ID0']['year'].max()))]
 data_for_SCF = data_for_SCF[['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','category','LabelL','LabelD','colour1']]
 data_for_SCF.columns=['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','category','LabelL','LabelD','colour']
 data_for_SCF = data_for_SCF[['ind','indicator','geo','year','colour']]
