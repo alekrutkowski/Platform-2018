@@ -89,8 +89,8 @@ colour_to_int = {
     'red': 1, # Critical situations
     'orange': 2, # To watch
     'yellow': 3, # Weak but improving
-    'blue': 4, # Good but to monitor
-    'white': 5, # On average
+    'white': 4, # On average
+    'blue': 5, # Good but to monitor
     'green': 6, # Better than average
     'dark_green': 7 # Best performers
 }
@@ -126,9 +126,9 @@ print('Finished For_SCF_tables_Input_Data_worksheet.csv')
 ###### -----------------------------------------------------------------------------------------------
     
 worksheet.write(1, 1,     "Best performers", dark_green) 
-worksheet.write(2, 1,     "Better than average", green) 
-worksheet.write(3, 1,     "On average", white ) 
-worksheet.write(4, 1,     "Good but deteriorating", blue)
+worksheet.write(2, 1,     "Better than average", green)
+worksheet.write(3, 1,     "Good but deteriorating", blue)
+worksheet.write(4, 1,     "On average", white )
 worksheet.write(5, 1,     "Weak but improving", yellow) 
 worksheet.write(6, 1,     "To watch", orange) 
 worksheet.write(7, 1,     "Critical situations", red) 
@@ -138,7 +138,7 @@ myCol=2
 for myIndicator in set(data['ind']): 
     myRow=1
     worksheet.write(0, myCol, myIndicator, white) 
-    for myColor in ['dark_green', 'green', 'white', 'blue', 'yellow', 'orange', 'red']:  
+    for myColor in ['dark_green', 'green', 'blue', 'white', 'yellow', 'orange', 'red']:
         countries=str(list(data[(data.colour==myColor) & (data.ind==myIndicator)]['geo']))
         countries=countries.replace("[","")
         countries=countries.replace("]","")

@@ -12,29 +12,36 @@ if not os.path.exists(file_path):
 
 import pandas as pd
 
-# Import rows 5 to 33 from the sheet named "TIME"
-# Note: Python uses 0-based indexing, Excel uses 1-based indexing
-# skiprows=4 skips the first 4 rows, and nrows=28 reads the next 29 rows (column header + 28 data rows)
-Participation_in_education_and_training = \
-    pd.read_excel(file_path, sheet_name='TIME', skiprows=4, nrows=28, engine='openpyxl')
-# Iterate through the columns and rename "Unnamed" columns
-new_columns = {}
-prev_column = None
-for column in Participation_in_education_and_training.columns:
-    if "Unnamed" in str(column):
-        new_columns[column] = f'flag_{prev_column}'
-    else:
-        prev_column = column
-# Rename the columns in the DataFrame
-Participation_in_education_and_training.rename(columns=new_columns, inplace=True)
-Participation_in_education_and_training = \
-    Participation_in_education_and_training[
-        [Participation_in_education_and_training.columns[0]] + # country name
-        [column for column in
-         Participation_in_education_and_training.columns if str(column).endswith('.1')]
-    ]
-Participation_in_education_and_training.rename(
-    columns={Participation_in_education_and_training.columns[0]: 'geo'}, inplace=True)
+
+# List of tuples with (sheet_name_prefix, usecols, new_column_names)
+sheets_and_columns = [
+    ('SEX', 'A,E,F,G', ['geo','TOTAL','MEN','WOMEN']),
+    ('AGE', 'A,H,I,J,K', ['geo','Y25-34','Y35-44','Y45-54','Y55-64']),
+    ('ISCED', 'A,G,H,I', ['geo','ISCED_0-2','ISCED_3-4','ISCED_5-8'])
+]
+
+# List to store each imported DataFrame
+dataframes = []
+for sheet_name_prefix, usecols, colnames in sheets_and_columns:
+    for year in [2016, 2022]:
+        # Import rows 5 to 33
+        # Note: Python uses 0-based indexing, Excel uses 1-based indexing
+        # skiprows=4 skips the first 4 rows, and nrows=28 reads the next 29 rows (column header + 28 data rows)
+        df = pd.read_excel(file_path,
+                           sheet_name=sheet_name_prefix+' - '+str(year),
+                           skiprows=5,
+                           nrows=28,
+                           usecols=usecols,
+                           header=None)
+        df.columns = colnames
+        df['year'] = year
+        df = pd.melt(df, id_vars=['geo','year'], var_name='group', value_name='value_n')
+        # Append the DataFrame to the list
+        dataframes.append(df)
+
+# Concatenate all DataFrames verticlly
+df = pd.concat(dataframes, axis=0).reset_index(drop=True)
+
 Eurostat_country_codes = {
     "EU-27": "EU27_2020",
     "Belgium": "BE",
@@ -66,42 +73,14 @@ Eurostat_country_codes = {
     "Sweden": "SE",
 }
 # Replace the country names in the "geo" column with their Eurostat codes
-Participation_in_education_and_training['geo'] = \
-    Participation_in_education_and_training['geo'].apply(lambda x: Eurostat_country_codes.get(x, x))
-# Remove the ".1" suffix from the column names
-Participation_in_education_and_training.columns = \
-    Participation_in_education_and_training.columns.map(lambda x: x[:-2] if x.endswith('.1') else x)
-## Reshape to long format
-# Step 1: Separate data and flag columns
-data_columns = [col for col in Participation_in_education_and_training.columns if not col.startswith('flag')]
-flag_columns = [col for col in Participation_in_education_and_training.columns if col.startswith('flag')]
-# Step 2: Melt data columns
-df_data_melted = pd.melt(Participation_in_education_and_training,
-                         id_vars='geo', value_vars=data_columns[1:], var_name='year', value_name='value_n')
-df_data_melted['year'] = df_data_melted['year'].str.replace('.1', '')  # Clean up the year column
-# Step 3: Melt flag columns
-# Adjust flag column names to match year format for easier merge
-df_flags = Participation_in_education_and_training[
-    ['geo'] +
-    flag_columns].rename(columns=lambda x: x.replace('flag_', '').replace('.1', ''))
-df_flags_melted = pd.melt(df_flags, id_vars='geo', var_name='year', value_name='flag')
-# Step 4: Merge data and flag DataFrames
-Participation_in_education_and_training = pd.merge(df_data_melted, df_flags_melted, on=['geo', 'year'], how='left')
-# Convert 'year' column to integers
-Participation_in_education_and_training['year'] = \
-    Participation_in_education_and_training['year'].astype(int)
+df['geo'] = df['geo'].apply(lambda x: Eurostat_country_codes.get(x, x))
+df['flag'] = ""
 # Convert 'value_n' column to floats
-Participation_in_education_and_training['value_n'] = \
-    pd.to_numeric(Participation_in_education_and_training['value_n'], errors='coerce')
-Participation_in_education_and_training['file'] = 'Participation_in_education_and_training'
+df['value_n'] = pd.to_numeric(df['value_n'], errors='coerce')
+df['file'] = 'Participation_in_education_and_training'
 Participation_in_education_and_training = \
-    Participation_in_education_and_training[['year', 'geo', 'file', 'value_n', 'flag']]
-Participation_in_education_and_training = \
-    Participation_in_education_and_training[
-        Participation_in_education_and_training['year'].
-            isin(sorted(Participation_in_education_and_training['year'].
-                        unique())[-2:]) # Keep only the last two years
-    ]
+    df[['year', 'geo', 'file', 'group', 'value_n', 'flag']]
+
 ## Artificially make the second-latest-available year = latest-available-year minus 3 to fit the subsequent scoreboard methodology => to be then correctrd in the Excel output
 latest_year = Participation_in_education_and_training['year'].max()
 second_latest_year = sorted(Participation_in_education_and_training['year'].unique())[-2]
