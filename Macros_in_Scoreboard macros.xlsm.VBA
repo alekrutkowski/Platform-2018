@@ -158,7 +158,7 @@ End Sub
 Sub special_adjustments_to_file1()
     Worksheets("Headline").Range("B2:H2").UnMerge
     Application.DisplayAlerts = False ' Suppress warnings for merge
-        For Each addr In Array("B2:C2", "D2:F2", "G2:H2", "AS2:AU2") ' the ranges to which you want to apply merge and borders
+        For Each addr In Array("B2:C2", "D2:F2", "G2:H2", "AS2:AU2", "AV2:AX2") ' the ranges to which you want to apply merge and borders
             Worksheets("Headline").Range(addr).Merge
             With Worksheets("Headline").Range(addr).Borders
                 .LineStyle = xlContinuous
@@ -173,16 +173,29 @@ Sub special_adjustments_to_file1()
         .Range("D2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/e48bf39d-5176-410d-b32f-f4a5d22fbfdd?lang=en"
         .Range("G2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/40ecd88d-1514-4d6b-8260-3c4f5b8f4d0a?lang=en"
         .Range("AS2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/4e3066d7-ad6b-4f3f-be92-99e33f4b5278?lang=en"
+        .Range("I2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/4e3066d7-ad6b-4f3f-be92-99e33f4b5278?lang=en"
+        .Range("L2").Value = "https://ec.europa.eu/eurostat/databrowser/view/tesem060/default/table?lang=en"
+        .Range("AA2").Value = "https://ec.europa.eu/eurostat/databrowser/view/tepsr_wc310/default/table?lang=en"
+        .Range("AD2").Value = "https://ec.europa.eu/eurostat/databrowser/view/ilc_pecs01/default/table?lang=en"
+        .Range("AG2").Value = "https://ec.europa.eu/eurostat/databrowser/view/ilc_pecs01/default/table?lang=en"
+        .Range("AM2").Value = "https://ec.europa.eu/eurostat/databrowser/view/tepsr_sp200/default/table?lang=en"
+        .Range("AV2").Value = "https://ec.europa.eu/eurostat/databrowser/view/tespm110/default/table?lang=en"
+        .Columns("B:C").ColumnWidth = 16
+        .Columns("G:H").ColumnWidth = 16 ' digital skills
         .Range("A1").Select
     End With
     Worksheets("Flags").Range("B2").Value = 2016
     Worksheets("Headline_flags").Range("B2").Value = 2016
-    Worksheets("Breakdowns").Range("DJ2:EA2").Replace What:="2021", Replacement:="2016", LookAt:=xlPart, _
+    Worksheets("Breakdowns").Range("B2:S2").Replace What:="2021", Replacement:="2016", LookAt:=xlPart, _
             SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
             ReplaceFormat:=False
-    Worksheets("Breakdowns_flags").Range("DJ2:EA2").Replace What:="2021", Replacement:="2016", LookAt:=xlPart, _
+    Worksheets("Breakdowns_flags").Range("B2:S2").Replace What:="2021", Replacement:="2016", LookAt:=xlPart, _
             SearchOrder:=xlByRows, MatchCase:=False, SearchFormat:=False, _
             ReplaceFormat:=False
+    Worksheets("Breakdowns").Columns("B:S").ColumnWidth = 16
+    Worksheets("Breakdowns_flags").Columns("B:S").ColumnWidth = 16
+    Worksheets("Breakdowns").Columns("Z:AC").ColumnWidth = 16 ' digital skills
+    Worksheets("Breakdowns_flags").Columns("Z:AC").ColumnWidth = 16 ' digital skills
 End Sub
 
 
