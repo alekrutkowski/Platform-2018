@@ -152,6 +152,9 @@ countries = df.columns[3:]  # List of country codes
 for country in countries:
     # Pivot the dataframe for the specific country with indicators as index and years as columns
     df_subset = df[['Indicator', 'year', country]].copy()
+    df_subset['max_year_per_indicator'] = df.groupby('Indicator')['year'].transform('max')
+    df_subset['year'] = df_subset['year'] - df_subset['max_year_per_indicator']
+    df_subset.drop(columns='max_year_per_indicator', inplace=True)
     df_subset_pivot = df_subset.pivot(index='Indicator', columns='year', values=country)
     # Find the last three available years
     last_years = sorted(df_subset['year'].unique())[-3:]
