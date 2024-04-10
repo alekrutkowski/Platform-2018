@@ -611,22 +611,45 @@ End Sub
 Sub format_disso5()
 Dim filepath As String
 
-    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
-    filepath = Replace(filepath, "dissemination", "output")
-    MsgBox "Opening: " & filepath & "For_SCF_tables_Input_Data_worksheet.csv", vbInformation, "Info"
-    Workbooks.Open Filename:=filepath & "For_SCF_tables_Input_Data_worksheet.csv"
-    MsgBox "Opening: U:\04 Data and tools\Reports\scoreboard\JER SCF Tables.xlsx", vbInformation, "Info"
-    Workbooks.Open Filename:="U:\04 Data and tools\Reports\scoreboard\JER SCF Tables.xlsx"
+     filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B20").Value
+     filepath = Replace(filepath, "dissemination", "output")
+     MsgBox "Opening: " & filepath & "For_SCF_tables_Input_Data_worksheet.xlsx", vbInformation, "Info"
+'    Workbooks.Open Filename:=filepath & "For_SCF_tables_Input_Data_worksheet.csv"
+'    MsgBox "Opening: U:\04 Data and tools\Reports\scoreboard\JER SCF Tables.xlsx", vbInformation, "Info"
+'    Workbooks.Open Filename:="U:\04 Data and tools\Reports\scoreboard\JER SCF Tables.xlsx"
+'
+'    Windows("For_SCF_tables_Input_Data_worksheet.csv").Activate
+'    Range("A1").Select
+'    Range(Selection, Selection.End(xlDown)).Select
+'    Range(Selection, Selection.End(xlToRight)).Select
+'    Selection.Copy
+'    Windows("JER SCF Tables.xlsx").Activate
+'    Sheets("NEW For_SCF_tables_Input_Data_w").Select
+'    ActiveSheet.Paste
+'    Worksheets("MS Tables").Activate
+'    filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B28").Value
+'    ' Turn off warnings to overwrite the file without prompts
+'    Application.DisplayAlerts = False
+'    ' Save the active workbook to the specified filepath
+'    ActiveWorkbook.SaveAs Filename:=filepath
+'    ActiveWorkbook.Close
+'    ' Turn warnings back on
+'    Application.DisplayAlerts = True
+'    Workbooks("For_SCF_tables_Input_Data_worksheet.csv").Close SaveChanges:=False
+'    MsgBox "Saved updated `JER SCF Tables.xlsx` as: " & filepath, vbInformation, "Info"
 
-    Windows("For_SCF_tables_Input_Data_worksheet.csv").Activate
-    Range("A1").Select
-    Range(Selection, Selection.End(xlDown)).Select
-    Range(Selection, Selection.End(xlToRight)).Select
-    Selection.Copy
-    Windows("JER SCF Tables.xlsx").Activate
-    Sheets("NEW For_SCF_tables_Input_Data_w").Select
-    ActiveSheet.Paste
-    Worksheets("MS Tables").Activate
+    Workbooks.Open Filename:= _
+        "U:\04 Data and tools\Reports\scoreboard\JER 25 SCF Tables 27032024.xlsx"
+    Windows("Scoreboard macros.xlsm").Activate
+    Set sourceWorkbook = Workbooks.Open(filepath & "For_SCF_tables_Input_Data_worksheet.xlsx")
+'    Windows("For_SCF_tables_Input_Data_worksheet.xlsx").Activate
+'    Sheets(Array("BE", "BG", "CZ", "DK", "DE", "EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", _
+'        "LV", "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SE")).Select
+'    Windows("JER 25 SCF Tables 27032024.xlsx").Activate
+    sourceWorkbook.Sheets(Array("BE", "BG", "CZ", "DK", "DE", "EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", _
+        "LV", "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SK", "FI", "SE")).Copy _
+        After:=Workbooks("JER 25 SCF Tables 27032024.xlsx").Sheets(5)
+    Sheets("MS Tables").Select
     filepath = Workbooks("Scoreboard macros.xlsm").Sheets(1).Range("B28").Value
     ' Turn off warnings to overwrite the file without prompts
     Application.DisplayAlerts = False
@@ -635,8 +658,8 @@ Dim filepath As String
     ActiveWorkbook.Close
     ' Turn warnings back on
     Application.DisplayAlerts = True
-    Workbooks("For_SCF_tables_Input_Data_worksheet.csv").Close SaveChanges:=False
-    MsgBox "Saved updated `JER SCF Tables.xlsx` as: " & filepath, vbInformation, "Info"
+    sourceWorkbook.Close SaveChanges:=False
+    MsgBox "Saved updated `JER 25 SCF Tables 27032024.xlsx` as: " & filepath, vbInformation, "Info"
 
 End Sub
 
