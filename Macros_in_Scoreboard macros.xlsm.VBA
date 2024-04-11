@@ -140,6 +140,7 @@ Dim filepath As String
 
     Windows("output.xlsx").Activate
     special_adjustments_to_file1 ' <---- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ReplaceNanWithEmptyString ' <---- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     Worksheets("Cut_offs II").Range("C2:F32").NumberFormat = "0.0"
     Worksheets("Cut_offs II").Columns(1).AutoFit
     Worksheets("Cut_offs II").Columns(2).AutoFit
@@ -184,6 +185,14 @@ Sub special_adjustments_to_file1()
         .Columns("G:H").ColumnWidth = 16 ' digital skills
         .Range("A1").Select
     End With
+    With Worksheets("Flags")
+        .Columns("B:C").ColumnWidth = 16
+        .Columns("G:H").ColumnWidth = 16 ' digital skills
+    End With
+    With Worksheets("Headline_flags")
+        .Columns("B:C").ColumnWidth = 16
+        .Columns("G:H").ColumnWidth = 16 ' digital skills
+    End With
     Worksheets("Flags").Range("B2").Value = 2016
     Worksheets("Headline_flags").Range("B2").Value = 2016
     Worksheets("Breakdowns").Range("B2:S2").Replace What:="2021", Replacement:="2016", LookAt:=xlPart, _
@@ -197,6 +206,26 @@ Sub special_adjustments_to_file1()
     Worksheets("Breakdowns").Columns("Z:AC").ColumnWidth = 16 ' digital skills
     Worksheets("Breakdowns_flags").Columns("Z:AC").ColumnWidth = 16 ' digital skills
 End Sub
+
+Sub ReplaceNanWithEmptyString()
+    Dim ws As Worksheet
+    Dim cell As Range
+    Application.ScreenUpdating = False ' Disable screen updating to speed up the macro.
+    Application.Calculation = xlCalculationManual ' Temporarily turn off automatic calculations.
+
+    For Each ws In ThisWorkbook.Worksheets
+        For Each cell In ws.UsedRange
+            If Not cell.HasFormula And VarType(cell.Value) = vbString Then ' Check if the cell is text and not a formula.
+                If cell.Value = "nan" Then
+                    cell.Value = ""
+                End If
+            End If
+        Next cell
+    Next ws
+    Application.Calculation = xlCalculationAutomatic ' Turn automatic calculations back on.
+    Application.ScreenUpdating = True ' Re-enable screen updating.
+End Sub
+
 
 
 Sub format_disso2()
