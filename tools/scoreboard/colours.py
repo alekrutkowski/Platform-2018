@@ -90,8 +90,8 @@ colour_to_int = {
     'red': 1, # Critical situations
     'orange': 2, # To watch
     'yellow': 3, # Weak but improving
-    'white': 4, # On average
-    'blue': 5, # Good but to monitor
+    'white': 5, # On average
+    'blue': 4, # Good but to monitor
     'green': 6, # Better than average
     'dark_green': 7 # Best performers
 }
