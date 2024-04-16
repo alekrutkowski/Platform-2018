@@ -75,7 +75,7 @@ data.columns=['ind','indicator','geo','year','level','scoreL','ydiff','scoreD','
 data.to_csv(localpath+'SCATTER.csv',index=False, float_format='%.3f')
 
 ###### ------ Additional file to feed into worksheet "Input data" in F1's SCF Tables Excel file ------
-print('Preparing file5...')
+print('Preparing data for file5...')
 data_for_SCF=pd.read_csv(localpath+"SCORES_all_years.csv")
 data_for_SCF['colour']=data_for_SCF.apply(getColorGroup, axis=1)
 data_for_SCF['colour1']=data_for_SCF.apply(getException, axis=1)
@@ -121,30 +121,31 @@ reshaped_data_for_SCF.sort_values(by=['year','ID_int'], inplace=True)
 country_order_in_columns = ['BE','BG','CZ','DK','DE','EE','IE','EL','ES','FR','HR','IT','CY','LV','LT','LU','HU',
                             'MT','NL','AT','PL','PT','RO','SI','SK','FI','SE']
 new_column_order = ['Indicator','Details','year'] + country_order_in_columns
-# reshaped_data_for_SCF[new_column_order].to_csv(localpath+'For_SCF_tables_Input_Data_worksheet.csv',
-#                                                index=False)
+reshaped_data_for_SCF[new_column_order].to_csv(localpath+'For_SCF_tables.csv',
+                                               index=False)
 
 df = reshaped_data_for_SCF[new_column_order]
-# The ordered list of indicators provided in your message
-ordered_indicators = [
-    "Adult participation in learning",
-    "Early leavers from education and training",
-    "Share of individuals who have basic or above basic overall digital skills",
-    "Young people not in employment, education or training",
-    "Gender employment gap",
-    "Income quintile ratio",
-    "Employment rate",
-    "Unemployment rate",
-    "Long-term unemployment rate",
-    "Gross disposable household income (GDHI) per capita growth",
-    "At risk of poverty or social exclusion (AROPE) rate",
-    "At risk of poverty or social exclusion (AROPE) rate for children",
-    "Impact of social transfers (other than pensions) on poverty reduction",
-    "Disability employment gap",
-    "Housing cost overburden",
-    "Children aged less than 3 years in formal childcare",
-    "Self-reported unmet need for medical care"
-]
+# The ordered list of indicators
+# TO BE ADJUSTED FOR EACH ANNUAL JER EDITION:
+latest_years = {
+    "Adult participation in learning" : 2022,
+    "Early leavers from education and training" : 2022,
+    "Share of individuals who have basic or above basic overall digital skills" : 2023,
+    "Young people not in employment, education or training" : 2022,
+    "Gender employment gap" : 2023,
+    "Income quintile ratio" : 2022,
+    "Employment rate" : 2023,
+    "Unemployment rate" : 2023,
+    "Long-term unemployment rate" : 2023,
+    "Gross disposable household income (GDHI) per capita growth" : 2022,
+    "At risk of poverty or social exclusion (AROPE) rate" : 2022,
+    "At risk of poverty or social exclusion (AROPE) rate for children" : 2022,
+    "Impact of social transfers (other than pensions) on poverty reduction" : 2022,
+    "Disability employment gap" : 2022,
+    "Housing cost overburden" : 2022,
+    "Children aged less than 3 years in formal childcare" : 2022,
+    "Self-reported unmet need for medical care" : 2022
+}
 # Initialize a dictionary to hold the dataframes for each country
 country_dfs = {}
 countries = df.columns[3:]  # List of country codes
@@ -152,16 +153,14 @@ countries = df.columns[3:]  # List of country codes
 for country in countries:
     # Pivot the dataframe for the specific country with indicators as index and years as columns
     df_subset = df[['Indicator', 'year', country]].copy()
-    df_subset['max_year_per_indicator'] = df.groupby('Indicator')['year'].transform('max')
+    df_subset['max_year_per_indicator'] = df_subset['Indicator'].map(latest_years)
     df_subset['year'] = df_subset['year'] - df_subset['max_year_per_indicator']
-    df_subset.drop(columns='max_year_per_indicator', inplace=True)
+    df_subset = df_subset[df_subset['year'].isin([0, -1, -2])]
+    df_subset['max_year_per_indicator'] = df_subset['Indicator']
     df_subset_pivot = df_subset.pivot(index='Indicator', columns='year', values=country)
-    # Find the last three available years
-    last_years = sorted(df_subset['year'].unique())[-3:]
-    # Reindex the dataframe to ensure all required indicators are included, filling missing values with 0
-    df_country = df_subset_pivot.reindex(ordered_indicators).fillna(0)
-    # Select only the columns for the last three years
-    df_country = df_country[last_years]
+    # Reindex the dataframe to ensure all required indicators are included in the appropriate order, filling missing values with 0
+    df_country = df_subset_pivot.reindex(list(latest_years.keys())).fillna(0)
+    df_country['0 = ...'] = df_country.index.map(latest_years)
     # Add the resulting dataframe to the dictionary
     country_dfs[country] = df_country
 # Create an Excel writer object using pandas
@@ -189,7 +188,7 @@ excel_writer.close()
 #             target_sheet[cell.coordinate].value = cell.value
 # # Save the target workbook
 # target_wb.save(basicpath+'dissemination\\'+'Social Scoreboard - version 24 March - file5.xlsx')
-print('Finished file5')
+print('Finished data prep for file5')
 ###### -----------------------------------------------------------------------------------------------
     
 worksheet.write(1, 1,     "Best performers", dark_green) 
