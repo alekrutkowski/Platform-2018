@@ -129,9 +129,9 @@ df = reshaped_data_for_SCF[new_column_order]
 # TO BE ADJUSTED FOR EACH ANNUAL JER EDITION:
 latest_years = {
     "Adult participation in learning" : 2022,
-    "Early leavers from education and training" : 2022,
+    "Early leavers from education and training" : 2023,
     "Share of individuals who have basic or above basic overall digital skills" : 2023,
-    "Young people not in employment, education or training" : 2022,
+    "Young people not in employment, education or training" : 2023,
     "Gender employment gap" : 2023,
     "Income quintile ratio" : 2022,
     "Employment rate" : 2023,

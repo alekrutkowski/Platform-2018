@@ -294,9 +294,9 @@ for indic in set(JER_Scoreboard_h['IND_CODE']):
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
-        # if (tmp['IND_CODE'] == 'ID4').any(): # if not empty
-        #     tmp.loc[(tmp['IND_CODE']=='ID4') & tmp['value_n'].notna(),
-        #             'ychange'] = 0 # EXCEPTIONAL - TEMPORARY !!! ★
+        if (tmp['IND_CODE'] == 'ID4').any(): # if not empty
+            tmp.loc[(tmp['IND_CODE']=='ID4') & tmp['value_n'].notna() & tmp['ychange'].isna(),
+                    'ychange'] = 0 # EXCEPTIONAL - TEMPORARY !!! ★
         # changes=changes.append(tmp)
         changes = pd.concat([changes, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 
@@ -326,6 +326,9 @@ scoresD = scoresD[['IND_CODE','Indicator','geo','year','ychange','ychange_flag',
 # Merge scores for levels with scores for differences
 scores = pd.merge(scores,scoresD,on=['IND_CODE','Indicator','geo','year'])
 
+scores.loc[(scores['IND_CODE']=='ID4') & (scores['year']==2021) & (scores['score_ychange'].isna()),
+           'score_ychange'] = 0  # EXCEPTIONAL - TEMPORARY !!! ★
+
 #Calculate color categories and apply labels
 #scores=scores[(scores.year>=2015)]
 print('Labeling data - headline indicators...')
@@ -350,9 +353,9 @@ scores= JER_Scores
 # Prepare the dataframe for saving
 scores.columns=['code','indicator','type','Order','lastYear','sense','change','group','geo','year','level','flag','scoreL','ydiff','ydiff_flag','scoreD','category','LabelL','LabelD']
 # scores = scores[scores['code']!='ID122'] # EXCEPTIONAL - TEMPORARY !!! ★
-# scores.loc[(scores['code']=='ID4') & (scores['year']==2021),
+# scores.loc[(scores['code']=='ID4') & (scores['year']==2021) & (scores['scoreD'].isna()),
 #            'scoreD'] = 0  # EXCEPTIONAL - TEMPORARY !!! ★
-# scores.loc[(scores['code']=='ID4') & (scores['year']==2021),
+# scores.loc[(scores['code']=='ID4') & (scores['year']==2021) & (scores['LabelD'].isna()),
 #            'LabelD'] = 'On average'  # EXCEPTIONAL - TEMPORARY !!! ★
 # Save the scores
 scores.to_csv(localpath+'SCORES.csv')   # Scores saved: headline indicators, all countries, last year only
@@ -399,9 +402,9 @@ for indic in set(JER_Scoreboard_b['IND_CODE']):
         tmp['ychange_flag']=tmp['flag']+tmp['flag'].shift(1).replace('b','')
         if len(tmp)>0: tmp['ychange_flag']=tmp['ychange_flag'].replace(np.nan,'')
         if len(tmp)>0: tmp['ychange_flag'] = tmp.apply(lambda x: "".join(set(x['ychange_flag'])), axis=1)
-        # if (tmp['IND_CODE'] == 'ID4').any(): # if not empty
-        #     tmp.loc[(tmp['IND_CODE']=='ID4') & tmp['value_n'].notna(),
-        #             'ychange'] = 0 # EXCEPTIONAL - TEMPORARY !!! ★
+        if (tmp['IND_CODE'] == 'ID4').any(): # if not empty
+            tmp.loc[(tmp['IND_CODE']=='ID4') & tmp['value_n'].notna() & tmp['ychange'].isna(),
+                    'ychange'] = 0 # EXCEPTIONAL - TEMPORARY !!! ★
         # changes=changes.append(tmp)
         changes = pd.concat([changes, tmp], ignore_index=True)  # https://stackoverflow.com/a/75956237
 

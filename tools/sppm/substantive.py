@@ -53,12 +53,14 @@ def getSubstantive(dashboard):
     a=a.groupby(['IndicatorID','geo']).apply(perch_ch_short)    
     
     #TODO change column names to make them generic
+    a = a.reset_index(drop=True) ### 1st insertion
     a['change_long_pp'] = a.groupby(['IndicatorID','geo'])['value_n'].diff(longPeriod)
 #    a['change_long_%'] = a.groupby(['IndicatorID','geo'])['value_n'].pct_change(periods=longPeriod)*100
     a=a.groupby(['IndicatorID','geo']).apply(perch_ch_long)
     
     # Delete breaks
-    a=a[a.flag!='b'] 
+    a=a[a.flag!='b']
+    a = a.reset_index(drop=True) ### 2nd insertion
     b=a.sort_values(by=['IndicatorID','geo'])
     
     #Create the distribution of absolute values

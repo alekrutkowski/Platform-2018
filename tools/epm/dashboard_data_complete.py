@@ -119,7 +119,7 @@ indicators=data.groupby(by=['IndicatorID'])
 refYear=""
 dashboardData={}
 for nme, gr in indicators:
-    myIndicator=nme
+    myIndicator=nme[0] ############ <––-–
     #print(name)
     type_of_change=changeType[myIndicator]
     type_of_sense=sense[myIndicator]

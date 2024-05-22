@@ -13,7 +13,7 @@ import numpy as np
 #After redesign
 baseUrl='https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/'
 #Number of days minimum to download an existing file
-daysToNotDownload=0.1
+daysToNotDownload=0.5
 
 #SQlite databse with the information of the datasets downloaded from Eurostat
 #estatInfo='\\\\s-empl-py-stat1\\eurostat$\\Data\\estatInfo.db'
