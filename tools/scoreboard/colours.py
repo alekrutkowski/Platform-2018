@@ -133,18 +133,18 @@ latest_years = {
     "Share of individuals who have basic or above basic overall digital skills" : 2023,
     "Young people not in employment, education or training" : 2023,
     "Gender employment gap" : 2023,
-    "Income quintile ratio" : 2022,
+    "Income quintile ratio" : 2023,
     "Employment rate" : 2023,
     "Unemployment rate" : 2023,
     "Long-term unemployment rate" : 2023,
     "Gross disposable household income (GDHI) per capita growth" : 2022,
-    "At risk of poverty or social exclusion (AROPE) rate" : 2022,
-    "At risk of poverty or social exclusion (AROPE) rate for children" : 2022,
-    "Impact of social transfers (other than pensions) on poverty reduction" : 2022,
-    "Disability employment gap" : 2022,
-    "Housing cost overburden" : 2022,
-    "Children aged less than 3 years in formal childcare" : 2022,
-    "Self-reported unmet need for medical care" : 2022
+    "At risk of poverty or social exclusion (AROPE) rate" : 2023,
+    "At risk of poverty or social exclusion (AROPE) rate for children" : 2023,
+    "Impact of social transfers (other than pensions) on poverty reduction" : 2023,
+    "Disability employment gap" : 2023,
+    "Housing cost overburden" : 2023,
+    "Children aged less than 3 years in formal childcare" : 2023,
+    "Self-reported unmet need for medical care" : 2023
 }
 # Initialize a dictionary to hold the dataframes for each country
 country_dfs = {}

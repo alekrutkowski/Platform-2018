@@ -173,8 +173,8 @@ Sub special_adjustments_to_file1()
         .Range("B2").Value = "https://circabc.europa.eu/ui/group/d14c857a-601d-438a-b878-4b4cebd0e10f/library/c5a8b987-1e37-44d7-a20e-2c50d6101d27/details"
         .Range("D2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/e48bf39d-5176-410d-b32f-f4a5d22fbfdd?lang=en"
         .Range("G2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/40ecd88d-1514-4d6b-8260-3c4f5b8f4d0a?lang=en"
-        .Range("AS2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/4e3066d7-ad6b-4f3f-be92-99e33f4b5278?lang=en"
-        .Range("I2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/4e3066d7-ad6b-4f3f-be92-99e33f4b5278?lang=en"
+        .Range("AS2").Value = "https://ec.europa.eu/eurostat/databrowser/bookmark/8ab72433-710a-4248-a9cc-d89400cc59a6?lang=en" ' Children in childcare
+        .Range("I2").Value = "https://ec.europa.eu/eurostat/databrowser/view/edat_lfse_20__custom_13196781/default/table?lang=en" ' NEET
         .Range("L2").Value = "https://ec.europa.eu/eurostat/databrowser/view/tesem060/default/table?lang=en"
         .Range("AA2").Value = "https://ec.europa.eu/eurostat/databrowser/view/tepsr_wc310/default/table?lang=en"
         .Range("AD2").Value = "https://ec.europa.eu/eurostat/databrowser/view/ilc_pecs01/default/table?lang=en"

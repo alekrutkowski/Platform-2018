@@ -216,6 +216,8 @@ def setLastYear(dataset):
             year=2022
         elif(indic == 'ID118'):
             year=2022
+        elif(indic == 'ID4'):
+            year=2023
         else:
             year = dataset[(dataset.IND_CODE==indic) & (dataset.geo=='EU27_2020') & (~dataset.value_n.isnull())].year.max()
         setField(indic,'lastYear',year)

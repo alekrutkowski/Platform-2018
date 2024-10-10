@@ -12,7 +12,7 @@ from tools.sppm.substantive import *
 
 startYear=2005
 #EU28Countries=["EU28","EU27_2020","EA19","BE","BG","CZ","DK","DE","EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", "LV", "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SK", "FI", "SE", "UK"]
-EUCountries=["EU27_2020","EA19","BE","BG","CZ","DK","DE","EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", "LV", "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SK", "FI", "SE"]
+EUCountries=["EU27_2020","EA20","BE","BG","CZ","DK","DE","EE", "IE", "EL", "ES", "FR", "HR", "IT", "CY", "LV", "LT", "LU", "HU", "MT", "NL", "AT", "PL", "PT", "RO", "SI", "SK", "FI", "SE"]
 #Get data and read configuration
 def getDashboardData(catalogue_object, cat_non_standard, file_output):    
     catalogueFormulas(cat_non_standard)   
@@ -256,8 +256,8 @@ while indic < len(dashboardData):
                
             worksheet.write(row, next(dynCol) ,str(rowLabels[subRow]), basic)
             for country in EUCountries:                
-                if country in data:
-                    mydata=data[country]
+                if (country,) in data:
+                    mydata=data[(country,)]
                     #We have three elements, one per row, and per element two positions: [value, style]
                     rowValues=[[str(mydata[0]), basic],[str(mydata[2]),eval(mydata[4])],[str(mydata[5]),eval(mydata[7])]]
                     #print(rowValues)                    
