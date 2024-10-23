@@ -137,7 +137,7 @@ latest_years = {
     "Employment rate" : 2023,
     "Unemployment rate" : 2023,
     "Long-term unemployment rate" : 2023,
-    "Gross disposable household income (GDHI) per capita growth" : 2022,
+    "Gross disposable household income (GDHI) per capita growth" : 2023,
     "At risk of poverty or social exclusion (AROPE) rate" : 2023,
     "At risk of poverty or social exclusion (AROPE) rate for children" : 2023,
     "Impact of social transfers (other than pensions) on poverty reduction" : 2023,
